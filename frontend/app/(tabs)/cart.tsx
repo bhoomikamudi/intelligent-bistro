@@ -1,25 +1,9 @@
+import { QuantityButton } from "@/components/QuantityButton";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/money";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-function QuantityButton({
-  label,
-  onPress,
-}: {
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      className="h-9 w-9 items-center justify-center rounded-lg border border-bistro-border bg-stone-900 active:opacity-70"
-    >
-      <Text className="text-lg font-semibold text-stone-200">{label}</Text>
-    </Pressable>
-  );
-}
 
 export default function CartScreen() {
   const { lines, subtotal, tax, total, increment, decrement, removeItem } = useCart();

@@ -1,5 +1,5 @@
 import { MenuItem } from "@/data/menu";
-import { createContext, useCallback, useContext, useMemo, useReducer } from "react";
+import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 
 export type CartLine = {
   item: MenuItem;
@@ -57,6 +57,23 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   }
 }
 
+let cartState: CartState = {};
+const listeners = new Set<() => void>();
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function getSnapshot() {
+  return cartState;
+}
+
+function dispatch(action: CartAction) {
+  cartState = cartReducer(cartState, action);
+  listeners.forEach((listener) => listener());
+}
+
 const TAX_RATE = 0.08;
 
 type CartContextValue = {
@@ -65,6 +82,7 @@ type CartContextValue = {
   subtotal: number;
   tax: number;
   total: number;
+  getQuantity: (itemId: string) => number;
   addItem: (item: MenuItem) => void;
   increment: (itemId: string) => void;
   decrement: (itemId: string) => void;
@@ -74,7 +92,7 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(cartReducer, {});
+  const state = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   const lines = useMemo(
     () => Object.values(state).sort((a, b) => a.item.name.localeCompare(b.item.name)),
@@ -93,6 +111,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const tax = useMemo(() => subtotal * TAX_RATE, [subtotal]);
   const total = useMemo(() => subtotal + tax, [subtotal, tax]);
+
+  const getQuantity = useCallback((itemId: string) => state[itemId]?.quantity ?? 0, [state]);
 
   const addItem = useCallback((item: MenuItem) => {
     dispatch({ type: "ADD", item });
@@ -117,12 +137,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       subtotal,
       tax,
       total,
+      getQuantity,
       addItem,
       increment,
       decrement,
       removeItem,
     }),
-    [lines, itemCount, subtotal, tax, total, addItem, increment, decrement, removeItem],
+    [lines, itemCount, subtotal, tax, total, getQuantity, addItem, increment, decrement, removeItem],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

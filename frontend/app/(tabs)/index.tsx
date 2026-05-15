@@ -1,12 +1,35 @@
+import { QuantityButton } from "@/components/QuantityButton";
 import { useCart } from "@/context/CartContext";
-import { menuCategories } from "@/data/menu";
+import { MenuItem, menuCategories } from "@/data/menu";
 import { formatPrice } from "@/lib/money";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function MenuScreen() {
-  const { addItem } = useCart();
+function MenuItemActions({ item }: { item: MenuItem }) {
+  const { getQuantity, addItem, increment, decrement } = useCart();
+  const quantity = getQuantity(item.id);
 
+  if (quantity === 0) {
+    return (
+      <Pressable
+        onPress={() => addItem(item)}
+        className="mt-3 self-start rounded-lg border border-bistro-accent/40 bg-bistro-accent/10 px-4 py-2 active:opacity-70"
+      >
+        <Text className="text-sm font-semibold text-bistro-accent">Add</Text>
+      </Pressable>
+    );
+  }
+
+  return (
+    <View className="mt-3 flex-row items-center gap-2">
+      <QuantityButton label="−" compact onPress={() => decrement(item.id)} />
+      <Text className="min-w-[24px] text-center text-sm font-bold text-bistro-accent">{quantity}</Text>
+      <QuantityButton label="+" compact onPress={() => increment(item.id)} />
+    </View>
+  );
+}
+
+export default function MenuScreen() {
   return (
     <SafeAreaView className="flex-1 bg-bistro-bg" edges={["top"]}>
       <View className="border-b border-bistro-border px-5 pb-4 pt-2">
@@ -37,12 +60,7 @@ export default function MenuScreen() {
                       <Text className="text-base font-bold text-bistro-accent">{formatPrice(item.price)}</Text>
                     </View>
                     <Text className="mt-1.5 text-sm leading-5 text-stone-400">{item.description}</Text>
-                    <Pressable
-                      onPress={() => addItem(item)}
-                      className="mt-3 self-start rounded-lg border border-bistro-accent/40 bg-bistro-accent/10 px-4 py-2 active:opacity-70"
-                    >
-                      <Text className="text-sm font-semibold text-bistro-accent">Add</Text>
-                    </Pressable>
+                    <MenuItemActions item={item} />
                   </View>
                 </View>
               </View>
