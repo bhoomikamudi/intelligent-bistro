@@ -6,6 +6,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
+import { CartProvider } from "@/context/CartContext";
 import "../global.css";
 
 export { ErrorBoundary } from "expo-router";
@@ -49,10 +50,12 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={navTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-    </ThemeProvider>
+    <CartProvider>
+      <ThemeProvider value={navTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </ThemeProvider>
+    </CartProvider>
   );
 }
