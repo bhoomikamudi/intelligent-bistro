@@ -1,3 +1,4 @@
+import { CartTabIcon } from "@/components/CartTabIcon";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 
@@ -38,7 +39,7 @@ export default function TabLayout() {
         name="cart"
         options={{
           title: "Cart",
-          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-cart" color={color} />,
+          tabBarIcon: ({ color }) => <CartTabIcon color={color} />,
         }}
       />
       <Tabs.Screen

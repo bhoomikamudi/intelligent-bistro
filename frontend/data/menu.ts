@@ -151,3 +151,9 @@ export const menuCategories: MenuCategory[] = [
 ];
 
 export const allMenuItems: MenuItem[] = menuCategories.flatMap((c) => c.items);
+
+export type MenuItemWithCategory = MenuItem & { category: string };
+
+export const menuForChat: MenuItemWithCategory[] = menuCategories.flatMap((c) =>
+  c.items.map((item) => ({ ...item, category: c.title })),
+);

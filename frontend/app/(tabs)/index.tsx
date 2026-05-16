@@ -2,7 +2,8 @@ import { QuantityButton } from "@/components/QuantityButton";
 import { useCart } from "@/context/CartContext";
 import { MenuItem, menuCategories } from "@/data/menu";
 import { formatPrice } from "@/lib/money";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useRef, useState } from "react";
+import { LayoutChangeEvent, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function MenuItemActions({ item }: { item: MenuItem }) {
@@ -30,22 +31,75 @@ function MenuItemActions({ item }: { item: MenuItem }) {
 }
 
 export default function MenuScreen() {
+  const scrollRef = useRef<ScrollView>(null);
+  const sectionOffsets = useRef<Record<string, number>>({});
+  const [activeCategory, setActiveCategory] = useState(menuCategories[0]?.id ?? "");
+
+  const scrollToCategory = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    const y = sectionOffsets.current[categoryId];
+    if (y !== undefined) {
+      scrollRef.current?.scrollTo({ y: Math.max(0, y - 8), animated: true });
+    }
+  };
+
+  const onSectionLayout = (categoryId: string) => (e: LayoutChangeEvent) => {
+    sectionOffsets.current[categoryId] = e.nativeEvent.layout.y;
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-bistro-bg" edges={["top"]}>
-      <View className="border-b border-bistro-border px-5 pb-4 pt-2">
+      <View className="border-b border-bistro-border px-5 pb-3 pt-2">
         <Text className="text-xs font-semibold uppercase tracking-[0.25em] text-bistro-accent">
           Intelligent Bistro
         </Text>
         <Text className="mt-1 text-3xl font-bold tracking-tight text-stone-50">{"Tonight's menu"}</Text>
         <View className="mt-3 h-px w-16 bg-bistro-accent" />
       </View>
+
+      <View className="border-b border-bistro-border bg-bistro-bg">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            flexDirection: "row",
+            gap: 8,
+          }}
+          className="flex-grow-0"
+        >
+          {menuCategories.map((cat) => {
+            const selected = activeCategory === cat.id;
+            return (
+              <Pressable
+                key={cat.id}
+                onPress={() => scrollToCategory(cat.id)}
+                className={`rounded-full border px-4 py-2 active:opacity-80 ${
+                  selected
+                    ? "border-bistro-accent bg-bistro-accent"
+                    : "border-bistro-border bg-bistro-card"
+                }`}
+              >
+                <Text
+                  className={`text-sm font-semibold ${selected ? "text-stone-950" : "text-stone-300"}`}
+                >
+                  {cat.title}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </View>
+
       <ScrollView
+        ref={scrollRef}
         className="flex-1 px-4 pt-4"
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
         {menuCategories.map((cat) => (
-          <View key={cat.id} className="mb-8">
+          <View key={cat.id} onLayout={onSectionLayout(cat.id)} className="mb-8">
             <Text className="mb-3 px-1 text-lg font-semibold text-stone-100">{cat.title}</Text>
             {cat.items.map((item) => (
               <View

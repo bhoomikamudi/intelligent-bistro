@@ -1,4 +1,4 @@
-import { MenuItem } from "@/data/menu";
+import { MenuItemWithCategory } from "@/data/menu";
 
 export type ChatCartAction =
   | { type: "add_item"; item_id: string; quantity?: number }
@@ -14,7 +14,7 @@ export type ChatResponse = {
 export type ChatRequest = {
   message: string;
   cart: { item_id: string; quantity: number; name: string; price: number }[];
-  menu: MenuItem[];
+  menu: MenuItemWithCategory[];
 };
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001";

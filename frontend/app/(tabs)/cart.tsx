@@ -2,6 +2,7 @@ import { QuantityButton } from "@/components/QuantityButton";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/money";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Link } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -14,14 +15,24 @@ export default function CartScreen() {
       <View className="border-b border-bistro-border px-5 pb-4 pt-2">
         <Text className="text-2xl font-bold text-stone-50">Cart</Text>
         <Text className="mt-1 text-sm text-stone-500">
-          {isEmpty ? "Add dishes from the menu to get started." : `${lines.length} item${lines.length === 1 ? "" : "s"} in your order`}
+          {isEmpty ? "Your table is waiting." : `${lines.length} dish${lines.length === 1 ? "" : "es"} selected`}
         </Text>
       </View>
 
       {isEmpty ? (
-        <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-center text-5xl">🛒</Text>
-          <Text className="mt-4 text-center text-base text-stone-400">Your cart is empty.</Text>
+        <View className="flex-1 items-center justify-center px-10">
+          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full border border-bistro-border bg-bistro-card">
+            <FontAwesome name="shopping-basket" size={40} color="#d4af37" />
+          </View>
+          <Text className="text-center text-xl font-semibold text-stone-100">Your cart is empty</Text>
+          <Text className="mt-2 text-center text-base leading-6 text-stone-500">
+            {"Browse tonight's menu and add dishes, or ask the concierge in Chat to build your order."}
+          </Text>
+          <Link href="/" asChild>
+            <Pressable className="mt-8 rounded-xl border border-bistro-accent/40 bg-bistro-accent/10 px-6 py-3 active:opacity-80">
+              <Text className="font-semibold text-bistro-accent">Browse menu</Text>
+            </Pressable>
+          </Link>
         </View>
       ) : (
         <>
@@ -81,10 +92,15 @@ export default function CartScreen() {
               <Text className="text-sm font-medium text-stone-200">{formatPrice(tax)}</Text>
             </View>
             <View className="my-2 h-px bg-bistro-border" />
-            <View className="flex-row justify-between">
+            <View className="mb-4 flex-row justify-between">
               <Text className="text-base font-semibold text-stone-50">Total</Text>
               <Text className="text-lg font-bold text-bistro-accent">{formatPrice(total)}</Text>
             </View>
+            <Pressable className="items-center rounded-xl bg-bistro-accent py-4 active:opacity-90">
+              <Text className="text-base font-bold tracking-wide text-stone-950">
+                Checkout · {formatPrice(total)}
+              </Text>
+            </Pressable>
           </SafeAreaView>
         </>
       )}
