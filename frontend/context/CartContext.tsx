@@ -1,4 +1,5 @@
 import { MenuItem } from "@/data/menu";
+import { ChatCartAction } from "@/lib/chat";
 import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 
 export type CartLine = {
@@ -12,7 +13,9 @@ type CartAction =
   | { type: "ADD"; item: MenuItem }
   | { type: "INCREMENT"; itemId: string }
   | { type: "DECREMENT"; itemId: string }
-  | { type: "REMOVE"; itemId: string };
+  | { type: "REMOVE"; itemId: string }
+  | { type: "SET_QUANTITY"; item: MenuItem; quantity: number }
+  | { type: "CLEAR" };
 
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
@@ -52,6 +55,19 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       delete next[action.itemId];
       return next;
     }
+    case "SET_QUANTITY": {
+      if (action.quantity <= 0) {
+        const next = { ...state };
+        delete next[action.item.id];
+        return next;
+      }
+      return {
+        ...state,
+        [action.item.id]: { item: action.item, quantity: action.quantity },
+      };
+    }
+    case "CLEAR":
+      return {};
     default:
       return state;
   }
@@ -87,6 +103,7 @@ type CartContextValue = {
   increment: (itemId: string) => void;
   decrement: (itemId: string) => void;
   removeItem: (itemId: string) => void;
+  applyChatActions: (actions: ChatCartAction[], menu: MenuItem[]) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -130,6 +147,36 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "REMOVE", itemId });
   }, []);
 
+  const applyChatActions = useCallback((actions: ChatCartAction[], menu: MenuItem[]) => {
+    const menuById = new Map(menu.map((item) => [item.id, item]));
+
+    for (const action of actions) {
+      if (action.type === "clear_cart") {
+        dispatch({ type: "CLEAR" });
+        continue;
+      }
+
+      const item = menuById.get(action.item_id);
+      if (!item) continue;
+
+      if (action.type === "remove_item") {
+        dispatch({ type: "REMOVE", itemId: action.item_id });
+        continue;
+      }
+
+      if (action.type === "update_quantity") {
+        dispatch({ type: "SET_QUANTITY", item, quantity: action.quantity });
+        continue;
+      }
+
+      if (action.type === "add_item") {
+        const addQty = action.quantity ?? 1;
+        const current = cartState[item.id]?.quantity ?? 0;
+        dispatch({ type: "SET_QUANTITY", item, quantity: current + addQty });
+      }
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       lines,
@@ -142,8 +189,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       increment,
       decrement,
       removeItem,
+      applyChatActions,
     }),
-    [lines, itemCount, subtotal, tax, total, getQuantity, addItem, increment, decrement, removeItem],
+    [
+      lines,
+      itemCount,
+      subtotal,
+      tax,
+      total,
+      getQuantity,
+      addItem,
+      increment,
+      decrement,
+      removeItem,
+      applyChatActions,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

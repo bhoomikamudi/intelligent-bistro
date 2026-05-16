@@ -149,3 +149,5 @@ export const menuCategories: MenuCategory[] = [
     ],
   },
 ];
+
+export const allMenuItems: MenuItem[] = menuCategories.flatMap((c) => c.items);
