@@ -6,7 +6,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
-import { CartProvider } from "@/context/CartContext";
+import { CartProvider } from "../context/CartContext";
 import "../global.css";
 
 export { ErrorBoundary } from "expo-router";

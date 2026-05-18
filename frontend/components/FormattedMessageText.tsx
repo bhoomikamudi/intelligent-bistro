@@ -33,7 +33,7 @@ export function FormattedMessageText({ text }: { text: string }) {
   const lines = text.split("\n");
 
   return (
-    <Text className="px-4 py-3.5 text-[15px] leading-[22px] text-stone-100">
+    <Text className="px-5 py-4 text-[15px] leading-[23px] text-stone-100">
       {lines.map((line, index) => {
         const headerMatch = line.match(/^##\s+(.+)$/);
         const isLast = index === lines.length - 1;

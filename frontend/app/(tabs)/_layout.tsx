@@ -1,4 +1,4 @@
-import { CartTabIcon } from "@/components/CartTabIcon";
+import { CartTabIcon } from "../../components/CartTabIcon";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 
@@ -15,17 +15,18 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         lazy: false,
+        animation: "fade",
         tabBarStyle: {
           backgroundColor: "#1c1917",
           borderTopColor: "#292524",
           borderTopWidth: 1,
-          height: 62,
-          paddingBottom: 8,
-          paddingTop: 6,
+          height: 64,
+          paddingBottom: 10,
+          paddingTop: 8,
         },
         tabBarActiveTintColor: "#d4af37",
         tabBarInactiveTintColor: "#78716c",
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "600" },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: "600", letterSpacing: 0.3 },
       }}
     >
       <Tabs.Screen

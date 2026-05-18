@@ -1,5 +1,5 @@
-import { MenuItem } from "@/data/menu";
-import { ChatCartAction } from "@/lib/chat";
+import { MenuItem } from "../data/menu";
+import { ChatCartAction } from "../lib/chat";
 import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 
 export type CartLine = {

@@ -1,10 +1,15 @@
-import { MenuItemWithCategory } from "@/data/menu";
+import { MenuItemWithCategory } from "../data/menu";
 
 export type ChatCartAction =
   | { type: "add_item"; item_id: string; quantity?: number }
   | { type: "remove_item"; item_id: string }
   | { type: "update_quantity"; item_id: string; quantity: number }
   | { type: "clear_cart" };
+
+export type ChatHistoryMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
 
 export type ChatResponse = {
   message: string;
@@ -13,6 +18,7 @@ export type ChatResponse = {
 
 export type ChatRequest = {
   message: string;
+  history: ChatHistoryMessage[];
   cart: { item_id: string; quantity: number; name: string; price: number }[];
   menu: MenuItemWithCategory[];
 };
