@@ -6,7 +6,7 @@ import { useCart } from "../../context/CartContext";
 import { menuForChat } from "../../data/menu";
 import { sendChatMessage } from "../../lib/chat";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   NativeSyntheticEvent,
@@ -63,6 +63,11 @@ export default function ChatScreen() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+  const cartSnapshotRef = useRef(lines);
+
+  useEffect(() => {
+    cartSnapshotRef.current = lines;
+  }, [lines]);
 
   const scrollToEnd = useCallback(() => {
     requestAnimationFrame(() => {
@@ -82,16 +87,19 @@ export default function ChatScreen() {
     const text = input.trim();
     if (!text || loading) return;
 
-    setMessages((prev) => [...prev, { id: `user-${Date.now()}`, role: "user", text }]);
+    const userMessage: ChatMessage = { id: `user-${Date.now()}`, role: "user", text };
+    const conversationWithUser = [...messages, userMessage];
+    const conversationForApi = buildHistory(conversationWithUser);
+
+    setMessages(conversationWithUser);
     setInput("");
     setLoading(true);
     scrollToEnd();
 
     try {
       const { message, actions } = await sendChatMessage({
-        message: text,
-        history: buildHistory(messages),
-        cart: lines.map((line) => ({
+        messages: conversationForApi,
+        cart: cartSnapshotRef.current.map((line) => ({
           item_id: line.item.id,
           quantity: line.quantity,
           name: line.item.name,
@@ -116,7 +124,7 @@ export default function ChatScreen() {
       setLoading(false);
       scrollToEnd();
     }
-  }, [input, loading, lines, messages, applyChatActions, buildHistory, scrollToEnd]);
+  }, [input, loading, messages, applyChatActions, buildHistory, scrollToEnd]);
 
   const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
     if (e.nativeEvent.key !== "Enter") return;

@@ -17,8 +17,8 @@ export type ChatResponse = {
 };
 
 export type ChatRequest = {
-  message: string;
-  history: ChatHistoryMessage[];
+  /** Full conversation (user + assistant), including the latest user turn. */
+  messages: ChatHistoryMessage[];
   cart: { item_id: string; quantity: number; name: string; price: number }[];
   menu: MenuItemWithCategory[];
 };
