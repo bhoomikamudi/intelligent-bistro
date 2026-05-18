@@ -23,7 +23,7 @@ function Dot({ delay }: { delay: number }) {
 
 export function TypingIndicator() {
   return (
-    <View style={styles.row}>
+    <View className="flex-row items-center gap-1.5 py-1">
       <Dot delay={0} />
       <Dot delay={160} />
       <Dot delay={320} />
@@ -32,16 +32,10 @@ export function TypingIndicator() {
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingVertical: 4,
-  },
   dot: {
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: theme.textSecondary,
+    backgroundColor: theme.gold,
   },
 });

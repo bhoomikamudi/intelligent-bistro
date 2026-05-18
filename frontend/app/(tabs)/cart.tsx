@@ -2,15 +2,14 @@ import { TabScreenWrapper } from "../components/TabScreenWrapper";
 import { theme } from "../../constants/theme";
 import { useCart } from "../../context/CartContext";
 import { formatPrice } from "../../lib/money";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function GoldQtyButton({ label, onPress }: { label: string; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} style={styles.qtyBtn}>
-      <Text style={styles.qtyBtnText}>{label}</Text>
+    <Pressable onPress={onPress} className="h-9 w-9 items-center justify-center rounded border border-gold">
+      <Text className="text-xl font-semibold text-gold">{label}</Text>
     </Pressable>
   );
 }
@@ -21,11 +20,11 @@ export default function CartScreen() {
 
   return (
     <TabScreenWrapper>
-      <SafeAreaView style={styles.safe} edges={["top"]}>
-        <View style={styles.header}>
-          <Text style={styles.headerLabel}>Your table</Text>
-          <Text style={styles.headerTitle}>Cart</Text>
-          <Text style={styles.headerSub}>
+      <SafeAreaView className="flex-1 bg-bistro" edges={["top"]}>
+        <View className="border-b border-[#222222] px-6 pb-5 pt-3">
+          <Text className="text-[11px] font-semibold uppercase tracking-[3px] text-gold">Your table</Text>
+          <Text className="mt-1.5 text-[30px] font-bold text-text-primary">Cart</Text>
+          <Text className="mt-1.5 text-sm text-muted">
             {isEmpty
               ? "Nothing selected yet."
               : `${lines.length} selection${lines.length === 1 ? "" : "s"}`}
@@ -33,41 +32,44 @@ export default function CartScreen() {
         </View>
 
         {isEmpty ? (
-          <View style={styles.empty}>
-            <FontAwesome name="shopping-basket" size={48} color={theme.goldDim} />
-            <Text style={styles.emptyTitle}>Your cart is empty</Text>
-            <Text style={styles.emptyBody}>Browse the menu or ask the concierge to curate your table.</Text>
+          <View className="flex-1 items-center justify-center px-10">
+            <Text className="text-5xl">🛒</Text>
+            <Text className="mt-5 text-center text-[22px] font-semibold text-text-primary">Your table is set</Text>
+            <Text className="mt-2.5 text-center text-[15px] leading-[22px] text-muted">
+              Add something delicious to get started
+            </Text>
             <Link href="/" asChild>
-              <Pressable style={styles.emptyBtn}>
-                <Text style={styles.emptyBtnText}>View menu</Text>
+              <Pressable className="mt-7 rounded-md border border-gold px-7 py-3 active:opacity-80">
+                <Text className="text-sm font-semibold text-gold">Browse menu</Text>
               </Pressable>
             </Link>
           </View>
         ) : (
           <>
             <ScrollView
-              style={styles.list}
+              className="flex-1"
               contentContainerStyle={styles.listContent}
               showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
             >
               {lines.map((line, i) => (
                 <View key={line.item.id}>
-                  {i > 0 && <View style={styles.divider} />}
-                  <View style={styles.line}>
-                    <View style={styles.lineTop}>
-                      <Text style={styles.lineName}>{line.item.name}</Text>
-                      <Text style={styles.linePrice}>
+                  {i > 0 && <View className="my-4 h-px bg-[#222222]" />}
+                  <View className="py-1">
+                    <View className="flex-row items-start justify-between gap-3">
+                      <Text className="flex-1 text-[17px] font-semibold text-text-primary">{line.item.name}</Text>
+                      <Text className="text-base font-semibold text-gold">
                         {formatPrice(line.item.price * line.quantity)}
                       </Text>
                     </View>
-                    <View style={styles.lineControls}>
-                      <View style={styles.qtyRow}>
+                    <View className="mt-3 flex-row items-center justify-between">
+                      <View className="flex-row items-center gap-3.5">
                         <GoldQtyButton label="−" onPress={() => decrement(line.item.id)} />
-                        <Text style={styles.qtyNum}>{line.quantity}</Text>
+                        <Text className="min-w-[28px] text-center text-base font-bold text-gold">{line.quantity}</Text>
                         <GoldQtyButton label="+" onPress={() => increment(line.item.id)} />
                       </View>
                       <Pressable onPress={() => removeItem(line.item.id)}>
-                        <Text style={styles.remove}>Remove</Text>
+                        <Text className="text-[13px] text-muted">Remove</Text>
                       </Pressable>
                     </View>
                   </View>
@@ -75,21 +77,21 @@ export default function CartScreen() {
               ))}
             </ScrollView>
 
-            <SafeAreaView edges={["bottom"]} style={styles.footer}>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Subtotal</Text>
-                <Text style={styles.summaryValue}>{formatPrice(subtotal)}</Text>
+            <SafeAreaView edges={["bottom"]} className="border-t border-[#222222] bg-card px-6 pb-2 pt-[18px]">
+              <View className="flex-row justify-between py-1.5">
+                <Text className="text-sm text-muted">Subtotal</Text>
+                <Text className="text-sm text-text-primary">{formatPrice(subtotal)}</Text>
               </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Tax (8%)</Text>
-                <Text style={styles.summaryValue}>{formatPrice(tax)}</Text>
+              <View className="flex-row justify-between py-1.5">
+                <Text className="text-sm text-muted">Tax (8%)</Text>
+                <Text className="text-sm text-text-primary">{formatPrice(tax)}</Text>
               </View>
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total</Text>
-                <Text style={styles.totalValue}>{formatPrice(total)}</Text>
+              <View className="mb-[18px] mt-2 flex-row items-center justify-between border-t border-[#222222] pt-3">
+                <Text className="text-[15px] font-bold text-text-primary">Total</Text>
+                <Text className="text-[22px] font-bold text-gold">{formatPrice(total)}</Text>
               </View>
-              <Pressable style={styles.checkout}>
-                <Text style={styles.checkoutText}>Checkout</Text>
+              <Pressable className="w-full items-center rounded-lg bg-gold py-4">
+                <Text className="text-base font-bold tracking-wide text-bistro">Checkout</Text>
               </Pressable>
             </SafeAreaView>
           </>
@@ -100,188 +102,9 @@ export default function CartScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: theme.bg,
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 20,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.border,
-  },
-  headerLabel: {
-    fontSize: 11,
-    fontWeight: "600",
-    letterSpacing: 3,
-    textTransform: "uppercase",
-    color: theme.gold,
-  },
-  headerTitle: {
-    marginTop: 6,
-    fontSize: 30,
-    fontWeight: "700",
-    color: theme.text,
-  },
-  headerSub: {
-    marginTop: 6,
-    fontSize: 14,
-    color: theme.textSecondary,
-  },
-  empty: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 40,
-  },
-  emptyTitle: {
-    marginTop: 20,
-    fontSize: 22,
-    fontWeight: "600",
-    color: theme.text,
-  },
-  emptyBody: {
-    marginTop: 10,
-    fontSize: 15,
-    lineHeight: 22,
-    textAlign: "center",
-    color: theme.textSecondary,
-  },
-  emptyBtn: {
-    marginTop: 28,
-    paddingVertical: 12,
-    paddingHorizontal: 28,
-    borderWidth: 1,
-    borderColor: theme.gold,
-    borderRadius: 6,
-  },
-  emptyBtnText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: theme.gold,
-  },
-  list: {
-    flex: 1,
-  },
   listContent: {
     paddingHorizontal: 24,
     paddingTop: 8,
     paddingBottom: 16,
-  },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: theme.border,
-    marginVertical: 16,
-  },
-  line: {
-    paddingVertical: 4,
-  },
-  lineTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 12,
-  },
-  lineName: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: "600",
-    color: theme.text,
-  },
-  linePrice: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: theme.gold,
-  },
-  lineControls: {
-    marginTop: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  qtyRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-  },
-  qtyBtn: {
-    width: 36,
-    height: 36,
-    borderWidth: 1,
-    borderColor: theme.gold,
-    borderRadius: 4,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  qtyBtnText: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: theme.gold,
-  },
-  qtyNum: {
-    minWidth: 28,
-    textAlign: "center",
-    fontSize: 16,
-    fontWeight: "700",
-    color: theme.gold,
-  },
-  remove: {
-    fontSize: 13,
-    color: theme.textMuted,
-  },
-  footer: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.border,
-    backgroundColor: theme.bgCard,
-    paddingHorizontal: 24,
-    paddingTop: 18,
-    paddingBottom: 8,
-  },
-  summaryRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 6,
-  },
-  summaryLabel: {
-    fontSize: 14,
-    color: theme.textSecondary,
-  },
-  summaryValue: {
-    fontSize: 14,
-    color: theme.text,
-  },
-  totalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 8,
-    marginBottom: 18,
-    paddingTop: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.border,
-  },
-  totalLabel: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: theme.text,
-  },
-  totalValue: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: theme.gold,
-  },
-  checkout: {
-    width: "100%",
-    backgroundColor: theme.gold,
-    borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-  checkoutText: {
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    color: theme.bg,
   },
 });

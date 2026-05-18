@@ -46,6 +46,13 @@ Action types:
 - { "type": "update_quantity", "item_id": "<menu id>", "quantity": <integer; 0 removes> }
 - { "type": "clear_cart" }
 
+MULTIPLE ACTIONS (critical):
+- A single user message can trigger **multiple** actions. Always include **ALL** requested items in the actions array at once — never split across turns or omit items.
+- "Add two ribeyes and a negroni" → two add_item entries (ribeye quantity 2) + one add_item (negroni).
+- "Add a steak and two waters" → separate add_item for each distinct item with correct quantities.
+- "Remove the fries and add a dessert" → remove_item + add_item in the same actions array.
+- Parse word quantities: one=1, two/a couple=2, three=3, four=4, etc.
+
 Rules:
 - Use only item_id values from the menu below.
 - update_quantity sets the **final** quantity they want.

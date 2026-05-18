@@ -1,17 +1,9 @@
 import { MenuHero } from "../components/menu/MenuHero";
 import { MenuItemCard } from "../components/menu/MenuItemCard";
 import { TabScreenWrapper } from "../components/TabScreenWrapper";
-import { theme } from "../../constants/theme";
 import { menuCategories } from "../../data/menu";
 import { useRef, useState } from "react";
-import {
-  LayoutChangeEvent,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { LayoutChangeEvent, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MenuScreen() {
@@ -35,14 +27,15 @@ export default function MenuScreen() {
 
   return (
     <TabScreenWrapper>
-      <SafeAreaView style={styles.safe} edges={["top"]}>
+      <SafeAreaView className="flex-1 bg-bistro" edges={["top"]}>
         <MenuHero />
 
-        <View style={styles.pillsBar}>
+        <View className="border-b border-[#222222] bg-bistro">
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.pillsContent}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 14, flexDirection: "row", gap: 10 }}
           >
             {menuCategories.map((cat) => {
               const active = activeCategory === cat.id;
@@ -50,9 +43,13 @@ export default function MenuScreen() {
                 <Pressable
                   key={cat.id}
                   onPress={() => scrollToCategory(cat.id)}
-                  style={[styles.pill, active && styles.pillActive]}
+                  className={`rounded-[20px] px-[18px] py-2.5 ${active ? "bg-gold" : "bg-transparent"}`}
                 >
-                  <Text style={[styles.pillText, active && styles.pillTextActive]}>{cat.title}</Text>
+                  <Text
+                    className={`text-[13px] font-semibold tracking-wide ${active ? "text-bistro" : "text-muted"}`}
+                  >
+                    {cat.title}
+                  </Text>
                 </Pressable>
               );
             })}
@@ -61,13 +58,14 @@ export default function MenuScreen() {
 
         <ScrollView
           ref={scrollRef}
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
+          className="flex-1"
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
         >
           {menuCategories.map((cat) => (
-            <View key={cat.id} onLayout={onSectionLayout(cat.id)} style={styles.section}>
-              <Text style={styles.sectionHeader}>{cat.title}</Text>
+            <View key={cat.id} onLayout={onSectionLayout(cat.id)} className="mb-7">
+              <Text className="mb-3.5 text-[11px] font-bold uppercase tracking-[3px] text-gold">{cat.title}</Text>
               {cat.items.map((item) => {
                 const index = itemIndex++;
                 return <MenuItemCard key={item.id} item={item} index={index} />;
@@ -79,58 +77,3 @@ export default function MenuScreen() {
     </TabScreenWrapper>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: theme.bg,
-  },
-  pillsBar: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.border,
-    backgroundColor: theme.bg,
-  },
-  pillsContent: {
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    flexDirection: "row",
-    gap: 10,
-  },
-  pill: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: "transparent",
-  },
-  pillActive: {
-    backgroundColor: theme.gold,
-  },
-  pillText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: theme.textMuted,
-    letterSpacing: 0.3,
-  },
-  pillTextActive: {
-    color: theme.bg,
-  },
-  list: {
-    flex: 1,
-  },
-  listContent: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 40,
-  },
-  section: {
-    marginBottom: 28,
-  },
-  sectionHeader: {
-    marginBottom: 14,
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 3,
-    textTransform: "uppercase",
-    color: theme.gold,
-  },
-});

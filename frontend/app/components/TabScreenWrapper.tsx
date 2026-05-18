@@ -1,4 +1,3 @@
-import { theme } from "../../constants/theme";
 import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet } from "react-native";
@@ -15,12 +14,15 @@ export function TabScreenWrapper({ children }: { children: React.ReactNode }) {
     }).start();
   }, [focused, opacity]);
 
-  return <Animated.View style={[styles.wrap, { opacity }]}>{children}</Animated.View>;
+  return (
+    <Animated.View className="flex-1 bg-bistro" style={[styles.wrap, { opacity }]}>
+      {children}
+    </Animated.View>
+  );
 }
 
 const styles = StyleSheet.create({
   wrap: {
     flex: 1,
-    backgroundColor: theme.bg,
   },
 });
