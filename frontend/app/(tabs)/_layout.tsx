@@ -1,4 +1,4 @@
-import { CartTabIcon } from "../../components/CartTabIcon";
+import { CartTabIcon } from "../components/CartTabIcon";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 

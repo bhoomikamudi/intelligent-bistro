@@ -1,7 +1,7 @@
-import { FadeInUp } from "../../components/animated/FadeInUp";
-import { CheckoutButton } from "../../components/cart/CheckoutButton";
-import { QuantityButton } from "../../components/QuantityButton";
-import { TabScreenWrapper } from "../../components/TabScreenWrapper";
+import { FadeInUp } from "../components/animated/FadeInUp";
+import { CheckoutButton } from "../components/cart/CheckoutButton";
+import { QuantityButton } from "../components/QuantityButton";
+import { TabScreenWrapper } from "../components/TabScreenWrapper";
 import { useCart } from "../../context/CartContext";
 import { formatPrice } from "../../lib/money";
 import FontAwesome from "@expo/vector-icons/FontAwesome";

@@ -1,6 +1,6 @@
-import { MenuHero } from "../../components/menu/MenuHero";
-import { MenuItemCard } from "../../components/menu/MenuItemCard";
-import { TabScreenWrapper } from "../../components/TabScreenWrapper";
+import { MenuHero } from "../components/menu/MenuHero";
+import { MenuItemCard } from "../components/menu/MenuItemCard";
+import { TabScreenWrapper } from "../components/TabScreenWrapper";
 import { menuCategories } from "../../data/menu";
 import { useRef, useState } from "react";
 import { LayoutChangeEvent, Pressable, ScrollView, Text, View } from "react-native";

@@ -1,6 +1,6 @@
-import { FormattedMessageText } from "../../components/FormattedMessageText";
-import { TabScreenWrapper } from "../../components/TabScreenWrapper";
-import { TypingIndicator } from "../../components/TypingIndicator";
+import { FormattedMessageText } from "../components/FormattedMessageText";
+import { TabScreenWrapper } from "../components/TabScreenWrapper";
+import { TypingIndicator } from "../components/TypingIndicator";
 import { useCart } from "../../context/CartContext";
 import { menuForChat } from "../../data/menu";
 import { sendChatMessage } from "../../lib/chat";
