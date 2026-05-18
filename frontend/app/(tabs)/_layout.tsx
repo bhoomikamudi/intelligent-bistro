@@ -1,12 +1,14 @@
 import { CartTabIcon } from "../components/CartTabIcon";
+import { theme } from "../../constants/theme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
+import { StyleSheet } from "react-native";
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) {
-  return <FontAwesome size={22} style={{ marginBottom: -2 }} {...props} />;
+  return <FontAwesome size={22} color={props.color} style={styles.tabIcon} />;
 }
 
 export default function TabLayout() {
@@ -16,17 +18,10 @@ export default function TabLayout() {
         headerShown: false,
         lazy: false,
         animation: "fade",
-        tabBarStyle: {
-          backgroundColor: "#1c1917",
-          borderTopColor: "#292524",
-          borderTopWidth: 1,
-          height: 64,
-          paddingBottom: 10,
-          paddingTop: 8,
-        },
-        tabBarActiveTintColor: "#d4af37",
-        tabBarInactiveTintColor: "#78716c",
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "600", letterSpacing: 0.3 },
+        tabBarStyle: styles.tabBar,
+        tabBarActiveTintColor: theme.gold,
+        tabBarInactiveTintColor: theme.textMuted,
+        tabBarLabelStyle: styles.tabLabel,
       }}
     >
       <Tabs.Screen
@@ -53,3 +48,22 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: "#000000",
+    borderTopColor: theme.border,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    height: 64,
+    paddingBottom: 10,
+    paddingTop: 8,
+  },
+  tabLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    letterSpacing: 0.3,
+  },
+  tabIcon: {
+    marginBottom: -2,
+  },
+});

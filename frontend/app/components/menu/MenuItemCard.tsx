@@ -1,67 +1,185 @@
-import { FadeInUp } from "../animated/FadeInUp";
-import { ScalePress } from "../animated/ScalePress";
-import { QuantityButton } from "../QuantityButton";
+import { theme } from "../../../constants/theme";
 import { useCart } from "../../../context/CartContext";
 import { MenuItem } from "../../../data/menu";
 import { formatPrice } from "../../../lib/money";
-import { Text, View } from "react-native";
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
-function ItemActions({ item }: { item: MenuItem }) {
-  const { getQuantity, addItem, increment, decrement } = useCart();
-  const quantity = getQuantity(item.id);
+function AddButton({ onPress }: { onPress: () => void }) {
+  const scale = useRef(new Animated.Value(1)).current;
 
-  if (quantity === 0) {
-    return (
-      <ScalePress
-        onPress={() => addItem(item)}
-        className="mt-4 self-start rounded-xl border border-bistro-accent/50 bg-bistro-accent/15 px-5 py-2.5"
-        scaleTo={0.9}
-      >
-        <Text className="text-sm font-bold tracking-wide text-bistro-accent">Add to order</Text>
-      </ScalePress>
-    );
-  }
+  const pressIn = () => {
+    Animated.timing(scale, { toValue: 0.92, duration: 100, useNativeDriver: true }).start();
+  };
+
+  const pressOut = () => {
+    Animated.timing(scale, { toValue: 1, duration: 100, useNativeDriver: true }).start();
+  };
 
   return (
-    <View className="mt-4 flex-row items-center gap-2.5">
-      <QuantityButton label="−" compact onPress={() => decrement(item.id)} />
-      <Text className="min-w-[28px] text-center text-sm font-bold text-bistro-accent">{quantity}</Text>
-      <QuantityButton label="+" compact onPress={() => increment(item.id)} />
+    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut}>
+      <Animated.View style={[styles.addButton, { transform: [{ scale }] }]}>
+        <Text style={styles.addButtonText}>Add</Text>
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+function QuantityControls({
+  quantity,
+  onDecrement,
+  onIncrement,
+}: {
+  quantity: number;
+  onDecrement: () => void;
+  onIncrement: () => void;
+}) {
+  return (
+    <View style={styles.quantityRow}>
+      <Pressable onPress={onDecrement} style={styles.qtyBtn}>
+        <Text style={styles.qtyBtnText}>−</Text>
+      </Pressable>
+      <Text style={styles.qtyValue}>{quantity}</Text>
+      <Pressable onPress={onIncrement} style={styles.qtyBtn}>
+        <Text style={styles.qtyBtnText}>+</Text>
+      </Pressable>
     </View>
   );
 }
 
 export function MenuItemCard({ item, index }: { item: MenuItem; index: number }) {
+  const { getQuantity, addItem, increment, decrement } = useCart();
+  const quantity = getQuantity(item.id);
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 450,
+      delay: index * 80,
+      useNativeDriver: true,
+    }).start();
+  }, [index, opacity]);
+
   return (
-    <FadeInUp index={index}>
-      <View className="mb-4 overflow-hidden rounded-3xl border border-bistro-border/80 bg-bistro-card">
-        <View className="p-5">
-          <View className="flex-row gap-4">
-            <View className="relative items-center justify-center rounded-2xl border border-bistro-accent/25 bg-bistro-accent/10 p-3 shadow-sm">
-              <View
-                className="absolute inset-0 rounded-2xl bg-bistro-accent/20"
-                style={{
-                  shadowColor: "#d4af37",
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.35,
-                  shadowRadius: 12,
-                }}
+    <Animated.View style={[styles.cardWrap, { opacity }]}>
+      <View style={styles.card}>
+        <View style={styles.row}>
+          <Text style={styles.emoji}>{item.emoji}</Text>
+          <View style={styles.body}>
+            <View style={styles.titleRow}>
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.price}>{formatPrice(item.price)}</Text>
+            </View>
+            <Text style={styles.description}>{item.description}</Text>
+            {quantity === 0 ? (
+              <AddButton onPress={() => addItem(item)} />
+            ) : (
+              <QuantityControls
+                quantity={quantity}
+                onDecrement={() => decrement(item.id)}
+                onIncrement={() => increment(item.id)}
               />
-              <Text className="text-[42px] leading-none">{item.emoji}</Text>
-            </View>
-            <View className="flex-1">
-              <View className="flex-row items-start justify-between gap-3">
-                <Text className="flex-1 text-lg font-semibold leading-6 tracking-tight text-stone-50">
-                  {item.name}
-                </Text>
-                <Text className="text-lg font-bold text-bistro-accent">{formatPrice(item.price)}</Text>
-              </View>
-              <Text className="mt-2 text-sm leading-[21px] text-stone-400">{item.description}</Text>
-              <ItemActions item={item} />
-            </View>
+            )}
           </View>
         </View>
       </View>
-    </FadeInUp>
+    </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  cardWrap: {
+    marginBottom: 14,
+  },
+  card: {
+    backgroundColor: theme.bgCard,
+    borderLeftWidth: 3,
+    borderLeftColor: theme.gold,
+    borderRadius: 4,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  row: {
+    flexDirection: "row",
+    gap: 14,
+  },
+  emoji: {
+    fontSize: 28,
+    lineHeight: 34,
+  },
+  body: {
+    flex: 1,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  name: {
+    flex: 1,
+    fontSize: 17,
+    fontWeight: "700",
+    color: theme.text,
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.gold,
+  },
+  description: {
+    marginTop: 6,
+    fontSize: 13,
+    lineHeight: 19,
+    color: theme.textSecondary,
+  },
+  addButton: {
+    marginTop: 14,
+    alignSelf: "flex-start",
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: theme.gold,
+    borderRadius: 4,
+  },
+  addButtonText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.gold,
+    letterSpacing: 0.5,
+  },
+  quantityRow: {
+    marginTop: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  qtyBtn: {
+    width: 32,
+    height: 32,
+    borderWidth: 1,
+    borderColor: theme.gold,
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  qtyBtnText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: theme.gold,
+  },
+  qtyValue: {
+    minWidth: 24,
+    textAlign: "center",
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.gold,
+  },
+});

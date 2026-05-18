@@ -1,9 +1,17 @@
 import { MenuHero } from "../components/menu/MenuHero";
 import { MenuItemCard } from "../components/menu/MenuItemCard";
 import { TabScreenWrapper } from "../components/TabScreenWrapper";
+import { theme } from "../../constants/theme";
 import { menuCategories } from "../../data/menu";
 import { useRef, useState } from "react";
-import { LayoutChangeEvent, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  LayoutChangeEvent,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MenuScreen() {
@@ -27,39 +35,24 @@ export default function MenuScreen() {
 
   return (
     <TabScreenWrapper>
-      <SafeAreaView className="flex-1" edges={["top"]}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <MenuHero />
 
-        <View className="border-b border-bistro-border/80 bg-bistro-bg/95">
+        <View style={styles.pillsBar}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: 20,
-              paddingVertical: 14,
-              flexDirection: "row",
-              gap: 10,
-            }}
+            contentContainerStyle={styles.pillsContent}
           >
             {menuCategories.map((cat) => {
-              const selected = activeCategory === cat.id;
+              const active = activeCategory === cat.id;
               return (
                 <Pressable
                   key={cat.id}
                   onPress={() => scrollToCategory(cat.id)}
-                  className={`rounded-full border px-5 py-2.5 active:opacity-85 ${
-                    selected
-                      ? "border-bistro-accent bg-bistro-accent"
-                      : "border-bistro-border bg-bistro-card"
-                  }`}
+                  style={[styles.pill, active && styles.pillActive]}
                 >
-                  <Text
-                    className={`text-sm font-semibold tracking-wide ${
-                      selected ? "text-stone-950" : "text-stone-300"
-                    }`}
-                  >
-                    {cat.title}
-                  </Text>
+                  <Text style={[styles.pillText, active && styles.pillTextActive]}>{cat.title}</Text>
                 </Pressable>
               );
             })}
@@ -68,15 +61,13 @@ export default function MenuScreen() {
 
         <ScrollView
           ref={scrollRef}
-          className="flex-1 px-5 pt-6"
-          contentContainerStyle={{ paddingBottom: 40 }}
+          style={styles.list}
+          contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         >
           {menuCategories.map((cat) => (
-            <View key={cat.id} onLayout={onSectionLayout(cat.id)} className="mb-10">
-              <Text className="mb-5 px-0.5 text-xs font-semibold uppercase tracking-[0.22em] text-bistro-accent">
-                {cat.title}
-              </Text>
+            <View key={cat.id} onLayout={onSectionLayout(cat.id)} style={styles.section}>
+              <Text style={styles.sectionHeader}>{cat.title}</Text>
               {cat.items.map((item) => {
                 const index = itemIndex++;
                 return <MenuItemCard key={item.id} item={item} index={index} />;
@@ -88,3 +79,58 @@ export default function MenuScreen() {
     </TabScreenWrapper>
   );
 }
+
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: theme.bg,
+  },
+  pillsBar: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.border,
+    backgroundColor: theme.bg,
+  },
+  pillsContent: {
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    flexDirection: "row",
+    gap: 10,
+  },
+  pill: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: "transparent",
+  },
+  pillActive: {
+    backgroundColor: theme.gold,
+  },
+  pillText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.textMuted,
+    letterSpacing: 0.3,
+  },
+  pillTextActive: {
+    color: theme.bg,
+  },
+  list: {
+    flex: 1,
+  },
+  listContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 40,
+  },
+  section: {
+    marginBottom: 28,
+  },
+  sectionHeader: {
+    marginBottom: 14,
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 3,
+    textTransform: "uppercase",
+    color: theme.gold,
+  },
+});

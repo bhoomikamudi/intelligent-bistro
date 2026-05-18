@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { CartProvider } from "../context/CartContext";
+import { theme } from "../constants/theme";
 import "../global.css";
 
 export { ErrorBoundary } from "expo-router";
@@ -21,11 +22,11 @@ const navTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    background: "#0c0a09",
-    card: "#1c1917",
-    text: "#fafaf9",
-    border: "#292524",
-    primary: "#d4af37",
+    background: theme.bg,
+    card: theme.bgCard,
+    text: theme.text,
+    border: theme.border,
+    primary: theme.gold,
   },
 };
 

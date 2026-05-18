@@ -1,5 +1,6 @@
+import { theme } from "../../constants/theme";
 import { Fragment, type ReactNode } from "react";
-import { Text } from "react-native";
+import { StyleSheet, Text } from "react-native";
 
 const BOLD_REGEX = /\*\*(.+?)\*\*/g;
 
@@ -15,7 +16,7 @@ function renderBoldLine(line: string) {
       parts.push(<Fragment key={`t-${key++}`}>{line.slice(lastIndex, match.index)}</Fragment>);
     }
     parts.push(
-      <Text key={`b-${key++}`} className="font-bold text-stone-50">
+      <Text key={`b-${key++}`} style={styles.bold}>
         {match[1]}
       </Text>,
     );
@@ -33,17 +34,14 @@ export function FormattedMessageText({ text }: { text: string }) {
   const lines = text.split("\n");
 
   return (
-    <Text className="px-5 py-4 text-[15px] leading-[23px] text-stone-100">
+    <Text style={styles.body}>
       {lines.map((line, index) => {
         const headerMatch = line.match(/^##\s+(.+)$/);
         const isLast = index === lines.length - 1;
 
         if (headerMatch) {
           return (
-            <Text
-              key={`h-${index}`}
-              className={`text-base font-semibold text-bistro-accent ${index > 0 ? "mt-2.5" : ""}`}
-            >
+            <Text key={`h-${index}`} style={[styles.header, index > 0 && styles.headerSpaced]}>
               {headerMatch[1]}
               {!isLast ? "\n" : ""}
             </Text>
@@ -60,3 +58,25 @@ export function FormattedMessageText({ text }: { text: string }) {
     </Text>
   );
 }
+
+const styles = StyleSheet.create({
+  body: {
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    fontSize: 15,
+    lineHeight: 23,
+    color: theme.text,
+  },
+  bold: {
+    fontWeight: "700",
+    color: theme.text,
+  },
+  header: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: theme.gold,
+  },
+  headerSpaced: {
+    marginTop: 10,
+  },
+});

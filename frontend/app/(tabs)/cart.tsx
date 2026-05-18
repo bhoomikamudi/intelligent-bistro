@@ -1,14 +1,19 @@
-import { FadeInUp } from "../components/animated/FadeInUp";
-import { CheckoutButton } from "../components/cart/CheckoutButton";
-import { QuantityButton } from "../components/QuantityButton";
 import { TabScreenWrapper } from "../components/TabScreenWrapper";
+import { theme } from "../../constants/theme";
 import { useCart } from "../../context/CartContext";
 import { formatPrice } from "../../lib/money";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+function GoldQtyButton({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} style={styles.qtyBtn}>
+      <Text style={styles.qtyBtnText}>{label}</Text>
+    </Pressable>
+  );
+}
 
 export default function CartScreen() {
   const { lines, subtotal, tax, total, increment, decrement, removeItem } = useCart();
@@ -16,118 +21,76 @@ export default function CartScreen() {
 
   return (
     <TabScreenWrapper>
-      <SafeAreaView className="flex-1" edges={["top"]}>
-        <View className="border-b border-bistro-border px-6 pb-5 pt-3">
-          <Text className="text-[11px] font-semibold uppercase tracking-[0.28em] text-bistro-accent">
-            Your table
-          </Text>
-          <Text className="mt-1 text-3xl font-bold tracking-tight text-stone-50">Cart</Text>
-          <Text className="mt-2 text-sm text-stone-500">
+      <SafeAreaView style={styles.safe} edges={["top"]}>
+        <View style={styles.header}>
+          <Text style={styles.headerLabel}>Your table</Text>
+          <Text style={styles.headerTitle}>Cart</Text>
+          <Text style={styles.headerSub}>
             {isEmpty
-              ? "Nothing selected yet — the kitchen is ready when you are."
-              : `${lines.length} selection${lines.length === 1 ? "" : "s"} · service included`}
+              ? "Nothing selected yet."
+              : `${lines.length} selection${lines.length === 1 ? "" : "s"}`}
           </Text>
         </View>
 
         {isEmpty ? (
-          <FadeInUp index={0} className="flex-1">
-            <View className="flex-1 items-center justify-center px-12">
-              <View
-                className="mb-8 h-28 w-28 items-center justify-center rounded-full border border-bistro-accent/30 bg-bistro-card"
-                style={{
-                  shadowColor: "#d4af37",
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 20,
-                }}
-              >
-                <FontAwesome name="shopping-basket" size={44} color="#d4af37" />
-              </View>
-              <Text className="text-center text-2xl font-semibold tracking-tight text-stone-100">
-                Your cart is empty
-              </Text>
-              <Text className="mt-3 text-center text-base leading-7 text-stone-500">
-                Explore the menu or ask our concierge to curate something memorable for your table.
-              </Text>
-              <Link href="/" asChild>
-                <Pressable className="mt-10 rounded-2xl border border-bistro-accent/40 bg-bistro-accent/10 px-8 py-3.5 active:opacity-85">
-                  <Text className="font-semibold text-bistro-accent">View menu</Text>
-                </Pressable>
-              </Link>
-            </View>
-          </FadeInUp>
+          <View style={styles.empty}>
+            <FontAwesome name="shopping-basket" size={48} color={theme.goldDim} />
+            <Text style={styles.emptyTitle}>Your cart is empty</Text>
+            <Text style={styles.emptyBody}>Browse the menu or ask the concierge to curate your table.</Text>
+            <Link href="/" asChild>
+              <Pressable style={styles.emptyBtn}>
+                <Text style={styles.emptyBtnText}>View menu</Text>
+              </Pressable>
+            </Link>
+          </View>
         ) : (
           <>
             <ScrollView
-              className="flex-1 px-5 pt-5"
-              contentContainerStyle={{ paddingBottom: 20 }}
+              style={styles.list}
+              contentContainerStyle={styles.listContent}
               showsVerticalScrollIndicator={false}
             >
-              {lines.map((line, index) => (
-                <Animated.View
-                  key={line.item.id}
-                  entering={FadeInDown.delay(index * 40)
-                    .duration(380)
-                    .springify()
-                    .damping(20)}
-                  className="mb-4 overflow-hidden rounded-3xl border border-bistro-border/80 bg-bistro-card p-5"
-                >
-                  <View className="flex-row gap-4">
-                    <View className="rounded-xl border border-bistro-accent/20 bg-bistro-accent/10 p-2.5">
-                      <Text className="text-3xl">{line.item.emoji}</Text>
-                    </View>
-                    <View className="flex-1">
-                      <View className="flex-row items-start justify-between gap-2">
-                        <Text className="flex-1 text-lg font-semibold text-stone-50">{line.item.name}</Text>
-                        <Text className="text-lg font-bold text-bistro-accent">
-                          {formatPrice(line.item.price * line.quantity)}
-                        </Text>
-                      </View>
-                      <Text className="mt-1 text-xs text-stone-500">
-                        {formatPrice(line.item.price)} each
+              {lines.map((line, i) => (
+                <View key={line.item.id}>
+                  {i > 0 && <View style={styles.divider} />}
+                  <View style={styles.line}>
+                    <View style={styles.lineTop}>
+                      <Text style={styles.lineName}>{line.item.name}</Text>
+                      <Text style={styles.linePrice}>
+                        {formatPrice(line.item.price * line.quantity)}
                       </Text>
-
-                      <View className="mt-4 flex-row items-center justify-between">
-                        <View className="flex-row items-center gap-2.5">
-                          <QuantityButton label="−" onPress={() => decrement(line.item.id)} />
-                          <Text className="min-w-[28px] text-center text-base font-semibold text-stone-100">
-                            {line.quantity}
-                          </Text>
-                          <QuantityButton label="+" onPress={() => increment(line.item.id)} />
-                        </View>
-
-                        <Pressable
-                          onPress={() => removeItem(line.item.id)}
-                          className="flex-row items-center gap-1.5 rounded-lg px-2 py-1.5 active:opacity-70"
-                        >
-                          <FontAwesome name="trash-o" size={16} color="#a8a29e" />
-                          <Text className="text-sm font-medium text-stone-400">Remove</Text>
-                        </Pressable>
+                    </View>
+                    <View style={styles.lineControls}>
+                      <View style={styles.qtyRow}>
+                        <GoldQtyButton label="−" onPress={() => decrement(line.item.id)} />
+                        <Text style={styles.qtyNum}>{line.quantity}</Text>
+                        <GoldQtyButton label="+" onPress={() => increment(line.item.id)} />
                       </View>
+                      <Pressable onPress={() => removeItem(line.item.id)}>
+                        <Text style={styles.remove}>Remove</Text>
+                      </Pressable>
                     </View>
                   </View>
-                </Animated.View>
+                </View>
               ))}
             </ScrollView>
 
-            <SafeAreaView
-              edges={["bottom"]}
-              className="border-t border-bistro-border bg-stone-950/90 px-6 pb-2 pt-5"
-            >
-              <View className="mb-1 flex-row justify-between py-1.5">
-                <Text className="text-sm text-stone-500">Subtotal</Text>
-                <Text className="text-sm font-medium text-stone-300">{formatPrice(subtotal)}</Text>
+            <SafeAreaView edges={["bottom"]} style={styles.footer}>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Subtotal</Text>
+                <Text style={styles.summaryValue}>{formatPrice(subtotal)}</Text>
               </View>
-              <View className="flex-row justify-between py-1.5">
-                <Text className="text-sm text-stone-500">Tax (8%)</Text>
-                <Text className="text-sm font-medium text-stone-300">{formatPrice(tax)}</Text>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Tax (8%)</Text>
+                <Text style={styles.summaryValue}>{formatPrice(tax)}</Text>
               </View>
-              <View className="my-3 h-px bg-bistro-border" />
-              <View className="mb-5 flex-row items-end justify-between">
-                <Text className="text-sm font-medium uppercase tracking-wider text-stone-500">Total</Text>
-                <Text className="text-2xl font-bold text-bistro-accent">{formatPrice(total)}</Text>
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>Total</Text>
+                <Text style={styles.totalValue}>{formatPrice(total)}</Text>
               </View>
-              <CheckoutButton total={total} />
+              <Pressable style={styles.checkout}>
+                <Text style={styles.checkoutText}>Checkout</Text>
+              </Pressable>
             </SafeAreaView>
           </>
         )}
@@ -135,3 +98,190 @@ export default function CartScreen() {
     </TabScreenWrapper>
   );
 }
+
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: theme.bg,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: 20,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.border,
+  },
+  headerLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    letterSpacing: 3,
+    textTransform: "uppercase",
+    color: theme.gold,
+  },
+  headerTitle: {
+    marginTop: 6,
+    fontSize: 30,
+    fontWeight: "700",
+    color: theme.text,
+  },
+  headerSub: {
+    marginTop: 6,
+    fontSize: 14,
+    color: theme.textSecondary,
+  },
+  empty: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 40,
+  },
+  emptyTitle: {
+    marginTop: 20,
+    fontSize: 22,
+    fontWeight: "600",
+    color: theme.text,
+  },
+  emptyBody: {
+    marginTop: 10,
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: "center",
+    color: theme.textSecondary,
+  },
+  emptyBtn: {
+    marginTop: 28,
+    paddingVertical: 12,
+    paddingHorizontal: 28,
+    borderWidth: 1,
+    borderColor: theme.gold,
+    borderRadius: 6,
+  },
+  emptyBtnText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.gold,
+  },
+  list: {
+    flex: 1,
+  },
+  listContent: {
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 16,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: theme.border,
+    marginVertical: 16,
+  },
+  line: {
+    paddingVertical: 4,
+  },
+  lineTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  lineName: {
+    flex: 1,
+    fontSize: 17,
+    fontWeight: "600",
+    color: theme.text,
+  },
+  linePrice: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.gold,
+  },
+  lineControls: {
+    marginTop: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  qtyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  qtyBtn: {
+    width: 36,
+    height: 36,
+    borderWidth: 1,
+    borderColor: theme.gold,
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  qtyBtnText: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: theme.gold,
+  },
+  qtyNum: {
+    minWidth: 28,
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.gold,
+  },
+  remove: {
+    fontSize: 13,
+    color: theme.textMuted,
+  },
+  footer: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.border,
+    backgroundColor: theme.bgCard,
+    paddingHorizontal: 24,
+    paddingTop: 18,
+    paddingBottom: 8,
+  },
+  summaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 6,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: theme.textSecondary,
+  },
+  summaryValue: {
+    fontSize: 14,
+    color: theme.text,
+  },
+  totalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 18,
+    paddingTop: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.border,
+  },
+  totalLabel: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.text,
+  },
+  totalValue: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: theme.gold,
+  },
+  checkout: {
+    width: "100%",
+    backgroundColor: theme.gold,
+    borderRadius: 8,
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  checkoutText: {
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    color: theme.bg,
+  },
+});
