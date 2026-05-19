@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { CartProvider } from "../context/CartContext";
 import { theme } from "../constants/theme";
@@ -32,9 +33,11 @@ const navTheme = {
 
 export default function RootLayout() {
   return (
-    <CartProvider>
-      <RootLayoutNav />
-    </CartProvider>
+    <SafeAreaProvider>
+      <CartProvider>
+        <RootLayoutNav />
+      </CartProvider>
+    </SafeAreaProvider>
   );
 }
 

@@ -1,32 +1,52 @@
 import { CartTabIcon } from "../components/CartTabIcon";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
+const GOLD = "#C9A84C";
+const MUTED = "#8A8070";
+
+type IoniconName = React.ComponentProps<typeof Ionicons>["name"];
+
+function TabIcon({
+  focused,
+  activeName,
+  inactiveName,
+}: {
+  focused: boolean;
+  activeName: IoniconName;
+  inactiveName: IoniconName;
 }) {
-  return <FontAwesome size={22} color={props.color} style={{ marginBottom: -2 }} />;
+  return (
+    <Ionicons
+      name={focused ? activeName : inactiveName}
+      size={24}
+      color={focused ? GOLD : MUTED}
+    />
+  );
 }
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+  const tabBarBottom = insets.bottom + 8;
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         lazy: false,
         animation: "fade",
+        tabBarActiveTintColor: GOLD,
+        tabBarInactiveTintColor: MUTED,
         tabBarStyle: {
           backgroundColor: "#000000",
           borderTopColor: "#222222",
           borderTopWidth: Platform.OS === "web" ? 1 : 0.5,
-          height: Platform.OS === "ios" ? 88 : 64,
-          paddingBottom: Platform.OS === "ios" ? 28 : 10,
           paddingTop: 8,
+          paddingBottom: tabBarBottom,
+          height: 56 + tabBarBottom,
         },
-        tabBarActiveTintColor: "#C9A84C",
-        tabBarInactiveTintColor: "#8A8070",
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: "600",
@@ -38,21 +58,25 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Menu",
-          tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon focused={focused} activeName="restaurant" inactiveName="restaurant-outline" />
+          ),
         }}
       />
       <Tabs.Screen
         name="cart"
         options={{
           title: "Cart",
-          tabBarIcon: ({ color }) => <CartTabIcon color={color} />,
+          tabBarIcon: ({ focused }) => <CartTabIcon focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
           title: "Chat",
-          tabBarIcon: ({ color }) => <TabBarIcon name="comments" color={color} />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon focused={focused} activeName="chatbubble" inactiveName="chatbubble-outline" />
+          ),
         }}
       />
     </Tabs>
