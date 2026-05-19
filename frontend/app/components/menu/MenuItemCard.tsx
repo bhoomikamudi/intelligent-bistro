@@ -1,31 +1,20 @@
-import { theme } from "../../../constants/theme";
 import { useCart } from "../../../context/CartContext";
 import { MenuItem } from "../../../data/menu";
 import { formatPrice } from "../../../lib/money";
 import { useEffect, useRef } from "react";
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 
 function AddButton({ onPress }: { onPress: () => void }) {
   const scale = useRef(new Animated.Value(1)).current;
 
-  const pressIn = () => {
-    Animated.timing(scale, { toValue: 0.92, duration: 100, useNativeDriver: true }).start();
-  };
-
-  const pressOut = () => {
-    Animated.timing(scale, { toValue: 1, duration: 100, useNativeDriver: true }).start();
-  };
-
   return (
-    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut}>
-      <Animated.View style={[styles.addButton, { transform: [{ scale }] }]}>
-        <Text style={styles.addButtonText}>Add</Text>
+    <Pressable
+      onPress={onPress}
+      onPressIn={() => Animated.timing(scale, { toValue: 0.94, duration: 100, useNativeDriver: true }).start()}
+      onPressOut={() => Animated.timing(scale, { toValue: 1, duration: 100, useNativeDriver: true }).start()}
+    >
+      <Animated.View style={{ transform: [{ scale }] }} className="mt-4 self-start rounded-lg bg-gold px-5 py-2.5">
+        <Text className="text-sm font-bold tracking-wide text-bistro">Add to order</Text>
       </Animated.View>
     </Pressable>
   );
@@ -41,13 +30,19 @@ function QuantityControls({
   onIncrement: () => void;
 }) {
   return (
-    <View style={styles.quantityRow}>
-      <Pressable onPress={onDecrement} style={styles.qtyBtn}>
-        <Text style={styles.qtyBtnText}>−</Text>
+    <View className="mt-4 flex-row items-center gap-3">
+      <Pressable
+        onPress={onDecrement}
+        className="h-9 w-9 items-center justify-center rounded-lg border border-gold/60 bg-elevated"
+      >
+        <Text className="text-lg font-semibold text-gold">−</Text>
       </Pressable>
-      <Text style={styles.qtyValue}>{quantity}</Text>
-      <Pressable onPress={onIncrement} style={styles.qtyBtn}>
-        <Text style={styles.qtyBtnText}>+</Text>
+      <Text className="min-w-[28px] text-center text-base font-bold text-gold">{quantity}</Text>
+      <Pressable
+        onPress={onIncrement}
+        className="h-9 w-9 items-center justify-center rounded-lg border border-gold/60 bg-elevated"
+      >
+        <Text className="text-lg font-semibold text-gold">+</Text>
       </Pressable>
     </View>
   );
@@ -68,16 +63,18 @@ export function MenuItemCard({ item, index }: { item: MenuItem; index: number })
   }, [index, opacity]);
 
   return (
-    <Animated.View style={[styles.cardWrap, { opacity }]}>
-      <View style={styles.card}>
-        <View style={styles.row}>
-          <Text style={styles.emoji}>{item.emoji}</Text>
-          <View style={styles.body}>
-            <View style={styles.titleRow}>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.price}>{formatPrice(item.price)}</Text>
+    <Animated.View style={{ opacity }} className="mb-4">
+      <View className="overflow-hidden rounded-2xl border border-[#222222] bg-card p-5">
+        <View className="flex-row gap-4">
+          <View className="h-[52px] w-[52px] items-center justify-center rounded-full border border-gold/20 bg-elevated">
+            <Text className="text-[28px] leading-8">{item.emoji}</Text>
+          </View>
+          <View className="flex-1">
+            <View className="flex-row items-start justify-between gap-3">
+              <Text className="flex-1 text-lg font-bold leading-6 text-text-primary">{item.name}</Text>
+              <Text className="text-lg font-bold text-gold">{formatPrice(item.price)}</Text>
             </View>
-            <Text style={styles.description}>{item.description}</Text>
+            <Text className="mt-2 text-[14px] leading-[21px] text-muted">{item.description}</Text>
             {quantity === 0 ? (
               <AddButton onPress={() => addItem(item)} />
             ) : (
@@ -93,93 +90,3 @@ export function MenuItemCard({ item, index }: { item: MenuItem; index: number })
     </Animated.View>
   );
 }
-
-const styles = StyleSheet.create({
-  cardWrap: {
-    marginBottom: 14,
-  },
-  card: {
-    backgroundColor: theme.bgCard,
-    borderLeftWidth: 3,
-    borderLeftColor: theme.gold,
-    borderRadius: 4,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-  },
-  row: {
-    flexDirection: "row",
-    gap: 14,
-  },
-  emoji: {
-    fontSize: 28,
-    lineHeight: 34,
-  },
-  body: {
-    flex: 1,
-  },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: 8,
-  },
-  name: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: "700",
-    color: theme.text,
-  },
-  price: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: theme.gold,
-  },
-  description: {
-    marginTop: 6,
-    fontSize: 13,
-    lineHeight: 19,
-    color: theme.textSecondary,
-  },
-  addButton: {
-    marginTop: 14,
-    alignSelf: "flex-start",
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: theme.gold,
-    borderRadius: 4,
-  },
-  addButtonText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: theme.gold,
-    letterSpacing: 0.5,
-  },
-  quantityRow: {
-    marginTop: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  qtyBtn: {
-    width: 32,
-    height: 32,
-    borderWidth: 1,
-    borderColor: theme.gold,
-    borderRadius: 4,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  qtyBtnText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: theme.gold,
-  },
-  qtyValue: {
-    minWidth: 24,
-    textAlign: "center",
-    fontSize: 15,
-    fontWeight: "700",
-    color: theme.gold,
-  },
-});

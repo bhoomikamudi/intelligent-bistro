@@ -66,8 +66,10 @@ function TypingBubble() {
 function ChatWelcome({ onChipPress }: { onChipPress: (text: string) => void }) {
   return (
     <View className="flex-1 items-center justify-center px-6 py-8">
-      <Text className="text-center text-4xl">🍽️</Text>
-      <Text className="mt-4 text-center text-[22px] font-bold tracking-[4px] text-text-primary">
+      <View className="mb-5 h-24 w-24 items-center justify-center rounded-full border border-gold/25 bg-elevated">
+        <Text className="text-5xl">🍽️</Text>
+      </View>
+      <Text className="text-center text-[22px] font-bold tracking-[3px] text-text-primary">
         INTELLIGENT BISTRO
       </Text>
       <Text className="mt-3 text-center text-[15px] text-muted">Your personal dining concierge</Text>

@@ -1,18 +1,10 @@
+import { CartLineRow } from "../components/cart/CartLineRow";
+import { EmptyState } from "../components/ui/EmptyState";
 import { TabScreenWrapper } from "../components/TabScreenWrapper";
-import { theme } from "../../constants/theme";
 import { useCart } from "../../context/CartContext";
 import { formatPrice } from "../../lib/money";
-import { Link } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-function GoldQtyButton({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <Pressable onPress={onPress} className="h-9 w-9 items-center justify-center rounded border border-gold">
-      <Text className="text-xl font-semibold text-gold">{label}</Text>
-    </Pressable>
-  );
-}
 
 export default function CartScreen() {
   const { lines, subtotal, tax, total, increment, decrement, removeItem } = useCart();
@@ -32,56 +24,30 @@ export default function CartScreen() {
         </View>
 
         {isEmpty ? (
-          <View className="flex-1 items-center justify-center px-10">
-            <Text className="text-5xl">🛒</Text>
-            <Text className="mt-5 text-center text-[22px] font-semibold text-text-primary">Your table is set</Text>
-            <Text className="mt-2.5 text-center text-[15px] leading-[22px] text-muted">
-              Add something delicious to get started
-            </Text>
-            <Link href="/" asChild>
-              <Pressable className="mt-7 rounded-md border border-gold px-7 py-3 active:opacity-80">
-                <Text className="text-sm font-semibold text-gold">Browse menu</Text>
-              </Pressable>
-            </Link>
-          </View>
+          <EmptyState
+            emoji="🛒"
+            title="Your table is set"
+            subtitle="Add something delicious from the menu or ask your concierge to curate your order."
+            actionLabel="Browse menu"
+            actionHref="/"
+          />
         ) : (
           <>
             <ScrollView
-              className="flex-1"
-              contentContainerStyle={styles.listContent}
+              className="flex-1 px-6"
+              contentContainerStyle={{ paddingTop: 8, paddingBottom: 16 }}
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
             >
               {lines.map((line, i) => (
                 <View key={line.item.id}>
                   {i > 0 && <View className="my-4 h-px bg-[#222222]" />}
-                  <View className="py-1">
-                    <View className="flex-row items-start gap-3">
-                      <View style={styles.emojiCircle}>
-                        <Text style={styles.emoji}>{line.item.emoji}</Text>
-                      </View>
-                      <View className="flex-1">
-                        <View className="flex-row items-start justify-between gap-3">
-                          <Text className="flex-1 text-[17px] font-semibold text-text-primary">{line.item.name}</Text>
-                          <Text className="text-base font-semibold text-gold">
-                            {formatPrice(line.item.price * line.quantity)}
-                          </Text>
-                        </View>
-                        <View className="mt-3 flex-row items-center justify-between">
-                          <View className="flex-row items-center gap-3.5">
-                            <GoldQtyButton label="−" onPress={() => decrement(line.item.id)} />
-                            <Text className="min-w-[28px] text-center text-base font-bold text-gold">
-                              {line.quantity}
-                            </Text>
-                            <GoldQtyButton label="+" onPress={() => increment(line.item.id)} />
-                          </View>
-                          <Pressable onPress={() => removeItem(line.item.id)}>
-                            <Text className="text-[13px] text-muted">Remove</Text>
-                          </Pressable>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
+                  <CartLineRow
+                    line={line}
+                    onDecrement={() => decrement(line.item.id)}
+                    onIncrement={() => increment(line.item.id)}
+                    onRemove={() => removeItem(line.item.id)}
+                  />
                 </View>
               ))}
             </ScrollView>
@@ -99,7 +65,7 @@ export default function CartScreen() {
                 <Text className="text-[15px] font-bold text-text-primary">Total</Text>
                 <Text className="text-[22px] font-bold text-gold">{formatPrice(total)}</Text>
               </View>
-              <Pressable className="w-full items-center rounded-lg bg-gold py-4">
+              <Pressable className="w-full items-center rounded-lg bg-gold py-4 active:opacity-90">
                 <Text className="text-base font-bold tracking-wide text-bistro">Checkout</Text>
               </Pressable>
             </SafeAreaView>
@@ -109,23 +75,3 @@ export default function CartScreen() {
     </TabScreenWrapper>
   );
 }
-
-const styles = StyleSheet.create({
-  listContent: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 16,
-  },
-  emojiCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#1A1A1A",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  emoji: {
-    fontSize: 22,
-    lineHeight: 26,
-  },
-});
