@@ -1,7 +1,7 @@
 import { CartTabIcon } from "../components/CartTabIcon";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { Platform } from "react-native";
+import { Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const GOLD = "#C9A84C";
@@ -41,17 +41,25 @@ export default function TabLayout() {
         tabBarInactiveTintColor: MUTED,
         tabBarStyle: {
           backgroundColor: "#000000",
-          borderTopColor: "#222222",
-          borderTopWidth: Platform.OS === "web" ? 1 : 0.5,
+          borderTopColor: GOLD,
+          borderTopWidth: 1,
           paddingTop: 8,
           paddingBottom: tabBarBottom,
           height: 56 + tabBarBottom,
         },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: "600",
-          letterSpacing: 0.3,
-        },
+        tabBarLabel: ({ focused, color, children }) => (
+          <Text
+            style={{
+              color,
+              fontSize: focused ? 12 : 11,
+              fontWeight: focused ? "700" : "600",
+              letterSpacing: 0.3,
+              marginTop: 2,
+            }}
+          >
+            {children}
+          </Text>
+        ),
       }}
     >
       <Tabs.Screen

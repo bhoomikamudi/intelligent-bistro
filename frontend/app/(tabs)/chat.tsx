@@ -1,6 +1,7 @@
 import { FormattedMessageText } from "../components/FormattedMessageText";
 import { TabScreenWrapper } from "../components/TabScreenWrapper";
 import { TypingIndicator } from "../components/TypingIndicator";
+import { serif, typography } from "../../constants/typography";
 import { theme } from "../../constants/theme";
 import { useCart } from "../../context/CartContext";
 import { menuForChat } from "../../data/menu";
@@ -33,20 +34,18 @@ const SUGGESTION_CHIPS = [
   "Surprise me 🎲",
 ] as const;
 
+const GOLD = "#C9A84C";
+const BISTRO_DARK = "#080808";
+const MUTED_GOLD_PLACEHOLDER = "#7A6530";
+
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
 
   return (
-    <View className={`mb-[18px] max-w-[88%] ${isUser ? "self-end" : "self-start"}`}>
-      {!isUser && (
-        <Text className="mb-1.5 ml-1 text-[10px] font-semibold uppercase tracking-[2px] text-muted">Concierge</Text>
-      )}
-      <View className={`overflow-hidden ${isUser ? "rounded-[18px] rounded-br-sm bg-gold" : "rounded-[18px] rounded-bl-sm bg-elevated"}`}>
-        {isUser ? (
-          <Text className="px-[18px] py-3.5 text-[15px] leading-[23px] text-bistro">{message.text}</Text>
-        ) : (
-          <FormattedMessageText text={message.text} />
-        )}
+    <View style={[styles.bubbleWrap, isUser ? styles.bubbleWrapUser : styles.bubbleWrapAi]}>
+      {!isUser && <Text style={styles.conciergeLabel}>CONCIERGE</Text>}
+      <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleAi]}>
+        {isUser ? <Text style={styles.userText}>{message.text}</Text> : <FormattedMessageText text={message.text} />}
       </View>
     </View>
   );
@@ -54,9 +53,9 @@ function MessageBubble({ message }: { message: ChatMessage }) {
 
 function TypingBubble() {
   return (
-    <View className="mb-[18px] max-w-[88%] self-start">
-      <Text className="mb-1.5 ml-1 text-[10px] font-semibold uppercase tracking-[2px] text-muted">Concierge</Text>
-      <View className="overflow-hidden rounded-[18px] rounded-bl-sm bg-elevated px-5 py-4">
+    <View style={[styles.bubbleWrap, styles.bubbleWrapAi]}>
+      <Text style={styles.conciergeLabel}>CONCIERGE</Text>
+      <View style={[styles.bubble, styles.bubbleAi, styles.typingBubble]}>
         <TypingIndicator />
       </View>
     </View>
@@ -65,22 +64,17 @@ function TypingBubble() {
 
 function ChatWelcome({ onChipPress }: { onChipPress: (text: string) => void }) {
   return (
-    <View className="flex-1 items-center justify-center px-6 py-8">
-      <View className="mb-5 h-24 w-24 items-center justify-center rounded-full border border-gold/25 bg-elevated">
-        <Text className="text-5xl">🍽️</Text>
+    <View style={styles.welcome}>
+      <View style={styles.welcomeLogo}>
+        <Text style={styles.welcomeEmoji}>🍽️</Text>
       </View>
-      <Text className="text-center text-[22px] font-bold tracking-[3px] text-text-primary">
-        INTELLIGENT BISTRO
-      </Text>
-      <Text className="mt-3 text-center text-[15px] text-muted">Your personal dining concierge</Text>
-      <View className="mt-8 w-full max-w-[340px] gap-3">
+      <View style={styles.welcomeDivider} />
+      <Text style={styles.welcomeTitle}>Intelligent Bistro</Text>
+      <Text style={styles.welcomeSub}>Your personal dining concierge</Text>
+      <View style={styles.chips}>
         {SUGGESTION_CHIPS.map((chip) => (
-          <Pressable
-            key={chip}
-            onPress={() => onChipPress(chip)}
-            className="rounded-xl border border-gold/40 bg-card px-4 py-3.5 active:opacity-80"
-          >
-            <Text className="text-center text-[15px] text-text-primary">{chip}</Text>
+          <Pressable key={chip} onPress={() => onChipPress(chip)} style={styles.chip}>
+            <Text style={styles.chipText}>{chip}</Text>
           </Pressable>
         ))}
       </View>
@@ -93,6 +87,7 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const cartSnapshotRef = useRef(lines);
 
@@ -175,22 +170,22 @@ export default function ChatScreen() {
 
   return (
     <TabScreenWrapper>
-      <SafeAreaView className="flex-1 bg-bistro" edges={["top"]}>
-        <View className="border-b border-[#222222] px-6 pb-[18px] pt-3">
-          <Text className="text-[11px] font-semibold uppercase tracking-[3px] text-gold">Concierge</Text>
-          <Text className="mt-1.5 text-[30px] font-bold text-text-primary">Chat</Text>
-          <Text className="mt-1.5 text-sm text-muted">Curated recommendations and seamless ordering.</Text>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
+        <View style={styles.header}>
+          <Text style={typography.labelCaps}>Concierge</Text>
+          <Text style={[typography.screenTitle, styles.chatTitle]}>Chat</Text>
+          <Text style={styles.headerSub}>Curated recommendations and seamless ordering.</Text>
         </View>
 
         <KeyboardAvoidingView
-          className="flex-1"
+          style={styles.flex}
           behavior={Platform.OS === "ios" ? "padding" : Platform.OS === "android" ? "height" : undefined}
           keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
         >
           <ScrollView
             ref={scrollRef}
-            className="flex-1"
-            contentContainerStyle={styles.messagesContent}
+            style={styles.flex}
+            contentContainerStyle={showWelcome ? styles.messagesWelcome : styles.messagesContent}
             onContentSizeChange={scrollToEnd}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
@@ -203,14 +198,16 @@ export default function ChatScreen() {
             {loading && <TypingBubble />}
           </ScrollView>
 
-          <SafeAreaView edges={["bottom"]} className="bg-bistro px-5 pb-1.5 pt-3">
-            <View className="flex-row items-end gap-2.5 rounded-xl bg-elevated p-2">
+          <SafeAreaView edges={["bottom"]} style={styles.inputBar}>
+            <View style={styles.inputRow}>
               <TextInput
-                style={styles.input}
+                style={[styles.input, inputFocused && styles.inputFocused]}
                 placeholder="Message your concierge..."
-                placeholderTextColor={theme.textMuted}
+                placeholderTextColor={MUTED_GOLD_PLACEHOLDER}
                 value={input}
                 onChangeText={setInput}
+                onFocus={() => setInputFocused(true)}
+                onBlur={() => setInputFocused(false)}
                 multiline={Platform.OS === "web"}
                 editable={!loading}
                 onSubmitEditing={handleSend}
@@ -222,9 +219,9 @@ export default function ChatScreen() {
               <Pressable
                 onPress={handleSend}
                 disabled={!canSend}
-                className={`h-11 w-11 items-center justify-center rounded-lg bg-gold ${!canSend ? "opacity-35" : ""}`}
+                style={[styles.sendBtn, !canSend && styles.sendBtnDisabled]}
               >
-                <FontAwesome name="send" size={16} color={theme.bg} />
+                <FontAwesome name="send" size={16} color={BISTRO_DARK} />
               </Pressable>
             </View>
           </SafeAreaView>
@@ -235,23 +232,186 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: theme.bg,
+  },
+  flex: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: 18,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.border,
+  },
+  chatTitle: {
+    marginTop: 6,
+  },
+  headerSub: {
+    marginTop: 6,
+    fontSize: 14,
+    lineHeight: 21,
+    color: theme.textSecondary,
+  },
   messagesContent: {
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 20,
+  },
+  messagesWelcome: {
     flexGrow: 1,
+    paddingBottom: 20,
+  },
+  welcome: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    minHeight: 420,
+  },
+  welcomeLogo: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    borderWidth: 1,
+    borderColor: "rgba(201, 168, 76, 0.4)",
+    backgroundColor: theme.bgCard,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  welcomeEmoji: {
+    fontSize: 48,
+    lineHeight: 52,
+  },
+  welcomeDivider: {
+    width: 56,
+    height: 1,
+    backgroundColor: GOLD,
+    marginTop: 20,
+    marginBottom: 16,
+    opacity: 0.7,
+  },
+  welcomeTitle: {
+    fontFamily: serif,
+    fontSize: 22,
+    fontWeight: "600",
+    color: GOLD,
+    letterSpacing: 1,
+  },
+  welcomeSub: {
+    marginTop: 8,
+    fontSize: 13,
+    lineHeight: 19.5,
+    color: theme.textSecondary,
+  },
+  chips: {
+    marginTop: 32,
+    width: "100%",
+    gap: 12,
+    paddingHorizontal: 0,
+  },
+  chip: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: GOLD,
+    backgroundColor: theme.bgCard,
+  },
+  chipText: {
+    textAlign: "center",
+    fontSize: 15,
+    fontWeight: "600",
+    color: GOLD,
+    lineHeight: 22.5,
+  },
+  bubbleWrap: {
+    marginBottom: 18,
+    maxWidth: "88%",
+  },
+  bubbleWrapUser: {
+    alignSelf: "flex-end",
+  },
+  bubbleWrapAi: {
+    alignSelf: "flex-start",
+  },
+  conciergeLabel: {
+    marginBottom: 6,
+    marginLeft: 4,
+    fontSize: 9,
+    fontWeight: "700",
+    letterSpacing: 3,
+    textTransform: "uppercase",
+    color: GOLD,
+  },
+  bubble: {
+    overflow: "hidden",
+  },
+  bubbleUser: {
+    backgroundColor: GOLD,
+    borderRadius: 18,
+    borderBottomRightRadius: 4,
+  },
+  bubbleAi: {
+    backgroundColor: theme.bgElevated,
+    borderRadius: 18,
+    borderBottomLeftRadius: 4,
+  },
+  userText: {
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    fontSize: 15,
+    lineHeight: 22.5,
+    color: BISTRO_DARK,
+    fontWeight: "500",
+  },
+  typingBubble: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  inputBar: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 6,
+    backgroundColor: theme.bg,
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 10,
+    backgroundColor: theme.bgElevated,
+    borderRadius: 12,
+    padding: 8,
   },
   input: {
     flex: 1,
-    minHeight: 44,
+    minHeight: 48,
     maxHeight: 100,
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 12,
     fontSize: 16,
+    lineHeight: 24,
     color: theme.text,
     borderWidth: 1,
-    borderColor: theme.gold,
-    borderRadius: 8,
+    borderColor: "rgba(201, 168, 76, 0.35)",
+    borderRadius: 10,
     backgroundColor: theme.bgCard,
+  },
+  inputFocused: {
+    borderColor: GOLD,
+    borderWidth: 1.5,
+  },
+  sendBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 10,
+    backgroundColor: GOLD,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sendBtnDisabled: {
+    opacity: 0.35,
   },
 });

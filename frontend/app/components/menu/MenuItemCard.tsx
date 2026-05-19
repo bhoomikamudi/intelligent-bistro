@@ -3,6 +3,7 @@ import { MenuItem } from "../../../data/menu";
 import { formatPrice } from "../../../lib/money";
 import { useEffect, useRef } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { theme } from "../../../constants/theme";
 
 const GOLD = "#C9A84C";
 const BISTRO_DARK = "#080808";
@@ -27,77 +28,161 @@ function QuantityControls({
   quantity,
   onDecrement,
   onIncrement,
+  opacity,
 }: {
   quantity: number;
   onDecrement: () => void;
   onIncrement: () => void;
+  opacity: Animated.Value;
 }) {
   return (
-    <View className="mt-4 w-full flex-row items-center justify-center gap-4">
-      <Pressable
-        onPress={onDecrement}
-        className="h-10 w-10 items-center justify-center rounded-lg border border-gold/60 bg-elevated"
-      >
-        <Text className="text-lg font-semibold text-gold">−</Text>
+    <Animated.View style={[styles.qtyRow, { opacity }]}>
+      <Pressable onPress={onDecrement} style={styles.qtyBtn}>
+        <Text style={styles.qtyBtnText}>−</Text>
       </Pressable>
-      <Text className="min-w-[32px] text-center text-base font-bold text-gold">{quantity}</Text>
-      <Pressable
-        onPress={onIncrement}
-        className="h-10 w-10 items-center justify-center rounded-lg border border-gold/60 bg-elevated"
-      >
-        <Text className="text-lg font-semibold text-gold">+</Text>
+      <Text style={styles.qtyValue}>{quantity}</Text>
+      <Pressable onPress={onIncrement} style={styles.qtyBtn}>
+        <Text style={styles.qtyBtnText}>+</Text>
       </Pressable>
-    </View>
+    </Animated.View>
   );
 }
 
-export function MenuItemCard({ item, index }: { item: MenuItem; index: number }) {
+export function MenuItemCard({
+  item,
+  index,
+  isLast,
+}: {
+  item: MenuItem;
+  index: number;
+  isLast?: boolean;
+}) {
   const { getQuantity, addItem, increment, decrement } = useCart();
   const quantity = getQuantity(item.id);
-  const opacity = useRef(new Animated.Value(0)).current;
+  const fadeIn = useRef(new Animated.Value(0)).current;
+  const controlsOpacity = useRef(new Animated.Value(quantity > 0 ? 1 : 0)).current;
 
   useEffect(() => {
-    Animated.timing(opacity, {
+    Animated.timing(fadeIn, {
       toValue: 1,
       duration: 450,
       delay: index * 80,
       useNativeDriver: true,
     }).start();
-  }, [index, opacity]);
+  }, [index, fadeIn]);
+
+  useEffect(() => {
+    Animated.timing(controlsOpacity, {
+      toValue: quantity > 0 ? 1 : 0,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
+  }, [quantity, controlsOpacity]);
 
   return (
-    <Animated.View style={{ opacity }} className="mb-4">
-      <View className="rounded-2xl border border-[#222222] bg-card p-5">
-        <View className="flex-row gap-4">
-          <View className="h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border border-gold/20 bg-elevated">
-            <Text className="text-[28px] leading-8">{item.emoji}</Text>
-          </View>
-          <View className="min-w-0 flex-1">
-            <View className="flex-row items-start justify-between gap-3">
-              <Text className="flex-1 text-lg font-bold leading-6 text-text-primary">{item.name}</Text>
-              <Text className="shrink-0 text-lg font-bold text-gold">{formatPrice(item.price)}</Text>
+    <Animated.View style={{ opacity: fadeIn }}>
+      <View style={[styles.card, !isLast && styles.cardBorder]}>
+        <View style={styles.goldBorder} />
+        <View style={styles.cardInner}>
+          <View style={styles.topRow}>
+            <View style={styles.emojiCircle}>
+              <Text style={styles.emoji}>{item.emoji}</Text>
+            </View>
+            <View style={styles.titleBlock}>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.price}>{formatPrice(item.price)}</Text>
+              </View>
             </View>
           </View>
+          <Text style={styles.description} numberOfLines={2} ellipsizeMode="tail">
+            {item.description}
+          </Text>
+          {quantity === 0 ? (
+            <AddButton onPress={() => addItem(item)} />
+          ) : (
+            <QuantityControls
+              quantity={quantity}
+              onDecrement={() => decrement(item.id)}
+              onIncrement={() => increment(item.id)}
+              opacity={controlsOpacity}
+            />
+          )}
         </View>
-        <Text className="mt-3 text-[14px] leading-[21px] text-muted">{item.description}</Text>
-        {quantity === 0 ? (
-          <AddButton onPress={() => addItem(item)} />
-        ) : (
-          <QuantityControls
-            quantity={quantity}
-            onDecrement={() => decrement(item.id)}
-            onIncrement={() => increment(item.id)}
-          />
-        )}
       </View>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
+  card: {
+    flexDirection: "row",
+    backgroundColor: theme.bgCard,
+    overflow: "hidden",
+  },
+  cardBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
+  },
+  goldBorder: {
+    width: 3,
+    backgroundColor: GOLD,
+  },
+  cardInner: {
+    flex: 1,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
+    paddingLeft: 16,
+  },
+  topRow: {
+    flexDirection: "row",
+    gap: 14,
+  },
+  emojiCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: theme.bgElevated,
+    borderWidth: 1,
+    borderColor: "rgba(201, 168, 76, 0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emoji: {
+    fontSize: 28,
+    lineHeight: 32,
+  },
+  titleBlock: {
+    flex: 1,
+    minWidth: 0,
+  },
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  name: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: "700",
+    lineHeight: 24,
+    color: theme.text,
+  },
+  price: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: GOLD,
+  },
+  description: {
+    marginTop: 10,
+    fontSize: 14,
+    lineHeight: 21,
+    color: theme.textSecondary,
+  },
   addButton: {
     alignSelf: "flex-start",
-    marginTop: 12,
+    marginTop: 14,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
@@ -108,5 +193,34 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "700",
     letterSpacing: 0.3,
+  },
+  qtyRow: {
+    marginTop: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 14,
+  },
+  qtyBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(201, 168, 76, 0.55)",
+    backgroundColor: theme.bgElevated,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  qtyBtnText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: GOLD,
+  },
+  qtyValue: {
+    minWidth: 28,
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "700",
+    color: GOLD,
   },
 });

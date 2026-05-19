@@ -9,6 +9,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { CartProvider } from "../context/CartContext";
 import { theme } from "../constants/theme";
+import { View } from "react-native";
 import "../global.css";
 
 export { ErrorBoundary } from "expo-router";
@@ -58,7 +59,7 @@ function RootLayoutNav() {
   }, [loaded]);
 
   if (!loaded) {
-    return null;
+    return <View style={{ flex: 1, backgroundColor: theme.bg }} />;
   }
 
   return (
