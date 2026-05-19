@@ -2,7 +2,10 @@ import { useCart } from "../../../context/CartContext";
 import { MenuItem } from "../../../data/menu";
 import { formatPrice } from "../../../lib/money";
 import { useEffect, useRef } from "react";
-import { Animated, Pressable, Text, View } from "react-native";
+import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+
+const GOLD = "#C9A84C";
+const BISTRO_DARK = "#080808";
 
 function AddButton({ onPress }: { onPress: () => void }) {
   const scale = useRef(new Animated.Value(1)).current;
@@ -12,13 +15,9 @@ function AddButton({ onPress }: { onPress: () => void }) {
       onPress={onPress}
       onPressIn={() => Animated.timing(scale, { toValue: 0.97, duration: 100, useNativeDriver: true }).start()}
       onPressOut={() => Animated.timing(scale, { toValue: 1, duration: 100, useNativeDriver: true }).start()}
-      className="mt-4 w-full"
     >
-      <Animated.View
-        style={{ transform: [{ scale }] }}
-        className="w-full items-center rounded-xl bg-gold py-3.5"
-      >
-        <Text className="text-[15px] font-bold tracking-wide text-bistro">Add to order</Text>
+      <Animated.View style={[styles.addButton, { transform: [{ scale }] }]}>
+        <Text style={styles.addButtonText}>Add to order</Text>
       </Animated.View>
     </Pressable>
   );
@@ -94,3 +93,20 @@ export function MenuItemCard({ item, index }: { item: MenuItem; index: number })
     </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  addButton: {
+    alignSelf: "flex-start",
+    marginTop: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: GOLD,
+  },
+  addButtonText: {
+    color: BISTRO_DARK,
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
+});
