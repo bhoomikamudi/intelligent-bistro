@@ -84,30 +84,30 @@ export function MenuItemCard({
       <View style={[styles.card, !isLast && styles.cardBorder]}>
         <View style={styles.goldBorder} />
         <View style={styles.cardInner}>
-          <View style={styles.topRow}>
+          <View style={styles.mainRow}>
             <View style={styles.emojiCircle}>
               <Text style={styles.emoji}>{item.emoji}</Text>
             </View>
-            <View style={styles.titleBlock}>
-              <View style={styles.nameRow}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.price}>{formatPrice(item.price)}</Text>
-              </View>
+            <View style={styles.leftCol}>
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.description} numberOfLines={2} ellipsizeMode="tail">
+                {item.description}
+              </Text>
+            </View>
+            <View style={styles.rightCol}>
+              <Text style={styles.price}>{formatPrice(item.price)}</Text>
+              {quantity === 0 ? (
+                <AddButton onPress={() => addItem(item)} />
+              ) : (
+                <QuantityControls
+                  quantity={quantity}
+                  onDecrement={() => decrement(item.id)}
+                  onIncrement={() => increment(item.id)}
+                  opacity={controlsOpacity}
+                />
+              )}
             </View>
           </View>
-          <Text style={styles.description} numberOfLines={2} ellipsizeMode="tail">
-            {item.description}
-          </Text>
-          {quantity === 0 ? (
-            <AddButton onPress={() => addItem(item)} />
-          ) : (
-            <QuantityControls
-              quantity={quantity}
-              onDecrement={() => decrement(item.id)}
-              onIncrement={() => increment(item.id)}
-              opacity={controlsOpacity}
-            />
-          )}
         </View>
       </View>
     </Animated.View>
@@ -130,19 +130,20 @@ const styles = StyleSheet.create({
   },
   cardInner: {
     flex: 1,
-    paddingTop: 16,
+    paddingTop: 14,
     paddingBottom: 12,
-    paddingHorizontal: 18,
-    paddingLeft: 16,
+    paddingHorizontal: 16,
+    paddingLeft: 14,
   },
-  topRow: {
+  mainRow: {
     flexDirection: "row",
-    gap: 14,
+    alignItems: "flex-start",
+    gap: 12,
   },
   emojiCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: theme.bgElevated,
     borderWidth: 1,
     borderColor: "rgba(201, 168, 76, 0.2)",
@@ -150,63 +151,58 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   emoji: {
-    fontSize: 28,
-    lineHeight: 32,
+    fontSize: 26,
+    lineHeight: 30,
   },
-  titleBlock: {
+  leftCol: {
     flex: 1,
     minWidth: 0,
-  },
-  nameRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: 10,
+    paddingRight: 8,
   },
   name: {
-    flex: 1,
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "700",
-    lineHeight: 24,
+    lineHeight: 22,
     color: theme.text,
+  },
+  description: {
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.textSecondary,
+  },
+  rightCol: {
+    alignItems: "flex-end",
+    flexShrink: 0,
   },
   price: {
     fontSize: 17,
     fontWeight: "700",
     color: GOLD,
   },
-  description: {
-    marginTop: 8,
-    marginBottom: 8,
-    fontSize: 14,
-    lineHeight: 21,
-    color: theme.textSecondary,
-  },
   addButton: {
-    alignSelf: "flex-start",
-    marginTop: 0,
+    marginTop: 6,
     paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
     backgroundColor: GOLD,
   },
   addButtonText: {
     color: BISTRO_DARK,
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "700",
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
   },
   qtyRow: {
-    marginTop: 0,
+    marginTop: 6,
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "flex-start",
-    gap: 14,
+    gap: 8,
   },
   qtyBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: "rgba(201, 168, 76, 0.55)",
     backgroundColor: theme.bgElevated,
@@ -214,14 +210,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   qtyBtnText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
     color: GOLD,
   },
   qtyValue: {
-    minWidth: 28,
+    minWidth: 22,
     textAlign: "center",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
     color: GOLD,
   },

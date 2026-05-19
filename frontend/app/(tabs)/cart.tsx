@@ -10,29 +10,14 @@ import { theme } from "../../constants/theme";
 
 const GOLD = "#C9A84C";
 const BISTRO_DARK = "#080808";
-const SCROLL_ITEM_THRESHOLD = 4;
+/** Space for pinned summary + checkout footer */
+const FOOTER_HEIGHT = 220;
 
 export default function CartScreen() {
   const { lines, subtotal, tax, total, increment, decrement, removeItem } = useCart();
   const insets = useSafeAreaInsets();
   const isEmpty = lines.length === 0;
-  const useScrollList = lines.length > SCROLL_ITEM_THRESHOLD;
-
-  const itemList = (
-    <>
-      {lines.map((line, i) => (
-        <View key={line.item.id}>
-          {i > 0 && <View style={styles.separator} />}
-          <CartLineRow
-            line={line}
-            onDecrement={() => decrement(line.item.id)}
-            onIncrement={() => increment(line.item.id)}
-            onRemove={() => removeItem(line.item.id)}
-          />
-        </View>
-      ))}
-    </>
-  );
+  const listBottomPad = FOOTER_HEIGHT + insets.bottom + 16;
 
   return (
     <TabScreenWrapper>
@@ -56,22 +41,33 @@ export default function CartScreen() {
             actionHref="/"
           />
         ) : (
-          <View>
-            {useScrollList ? (
-              <ScrollView
-                style={styles.itemsScroll}
-                contentContainerStyle={styles.itemsContent}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-                bounces
-              >
-                {itemList}
-              </ScrollView>
-            ) : (
-              <View style={styles.itemsStatic}>{itemList}</View>
-            )}
+          <View style={styles.body}>
+            <ScrollView
+              style={styles.itemsScroll}
+              contentContainerStyle={[styles.itemsContent, { paddingBottom: listBottomPad }]}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+              bounces
+            >
+              {lines.map((line, i) => (
+                <View key={line.item.id}>
+                  {i > 0 && <View style={styles.separator} />}
+                  <CartLineRow
+                    line={line}
+                    onDecrement={() => decrement(line.item.id)}
+                    onIncrement={() => increment(line.item.id)}
+                    onRemove={() => removeItem(line.item.id)}
+                  />
+                </View>
+              ))}
+            </ScrollView>
 
-            <View style={styles.summary}>
+            <View
+              style={[
+                styles.footer,
+                { paddingBottom: 16 + insets.bottom, paddingHorizontal: 16 },
+              ]}
+            >
               <View style={styles.summaryDivider} />
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Subtotal</Text>
@@ -85,7 +81,7 @@ export default function CartScreen() {
                 <Text style={styles.totalLabel}>Total</Text>
                 <Text style={styles.totalValue}>{formatPrice(total)}</Text>
               </View>
-              <Pressable style={[styles.checkout, { marginBottom: 16 + insets.bottom }]}>
+              <Pressable style={styles.checkout}>
                 <Text style={styles.checkoutText}>Checkout</Text>
               </Pressable>
             </View>
@@ -118,34 +114,36 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     color: theme.textSecondary,
   },
-  itemsStatic: {
-    paddingHorizontal: 16,
-    paddingTop: 4,
+  body: {
+    flex: 1,
+    position: "relative",
   },
   itemsScroll: {
-    maxHeight: 400,
+    flex: 1,
   },
   itemsContent: {
-    flexGrow: 0,
     paddingHorizontal: 16,
     paddingTop: 4,
-    paddingBottom: 8,
   },
   separator: {
     height: 1,
     backgroundColor: theme.border,
   },
-  summary: {
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: theme.bgCard,
     paddingTop: 4,
-    paddingHorizontal: 16,
-    marginTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: theme.border,
   },
   summaryDivider: {
     height: 1,
     backgroundColor: GOLD,
     opacity: 0.45,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   summaryRow: {
     flexDirection: "row",
@@ -166,9 +164,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 8,
-    marginBottom: 16,
-    paddingTop: 12,
+    marginTop: 4,
+    marginBottom: 12,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: theme.border,
   },
@@ -183,8 +181,6 @@ const styles = StyleSheet.create({
     color: GOLD,
   },
   checkout: {
-    marginTop: 16,
-    marginBottom: 16,
     backgroundColor: GOLD,
     borderRadius: 10,
     paddingVertical: 16,
