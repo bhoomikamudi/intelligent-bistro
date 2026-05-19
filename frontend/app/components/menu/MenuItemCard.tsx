@@ -18,7 +18,7 @@ function AddButton({ onPress }: { onPress: () => void }) {
       onPressOut={() => Animated.timing(scale, { toValue: 1, duration: 100, useNativeDriver: true }).start()}
     >
       <Animated.View style={[styles.addButton, { transform: [{ scale }] }]}>
-        <Text style={styles.addButtonText}>Add to order</Text>
+        <Text style={styles.addButtonText}>Add</Text>
       </Animated.View>
     </Pressable>
   );
