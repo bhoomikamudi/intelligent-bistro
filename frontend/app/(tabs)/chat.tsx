@@ -166,7 +166,7 @@ export default function ChatScreen() {
   };
 
   const canSend = input.trim().length > 0 && !loading;
-  const showWelcome = messages.length === 0 && !loading;
+  const isWelcomeState = messages.length === 0;
 
   return (
     <TabScreenWrapper>
@@ -182,21 +182,27 @@ export default function ChatScreen() {
           behavior={Platform.OS === "ios" ? "padding" : Platform.OS === "android" ? "height" : undefined}
           keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
         >
-          <ScrollView
-            ref={scrollRef}
-            style={styles.flex}
-            contentContainerStyle={showWelcome ? styles.messagesWelcome : styles.messagesContent}
-            onContentSizeChange={scrollToEnd}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-          >
-            {showWelcome ? <ChatWelcome onChipPress={sendMessage} /> : null}
-            {messages.map((msg) => (
-              <MessageBubble key={msg.id} message={msg} />
-            ))}
-            {loading && <TypingBubble />}
-          </ScrollView>
+          {isWelcomeState ? (
+            <View style={styles.welcomeContainer}>
+              <ChatWelcome onChipPress={sendMessage} />
+              {loading && <TypingBubble />}
+            </View>
+          ) : (
+            <ScrollView
+              ref={scrollRef}
+              style={styles.flex}
+              contentContainerStyle={styles.messagesContent}
+              onContentSizeChange={scrollToEnd}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+            >
+              {messages.map((msg) => (
+                <MessageBubble key={msg.id} message={msg} />
+              ))}
+              {loading && <TypingBubble />}
+            </ScrollView>
+          )}
 
           <SafeAreaView edges={["bottom"]} style={styles.inputBar}>
             <View style={styles.inputRow}>
@@ -260,16 +266,17 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 20,
   },
-  messagesWelcome: {
-    flexGrow: 1,
-    paddingBottom: 20,
+  welcomeContainer: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 24,
+    paddingBottom: 16,
   },
   welcome: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 24,
-    minHeight: 420,
+    width: "100%",
   },
   welcomeLogo: {
     width: 88,

@@ -10,11 +10,29 @@ import { theme } from "../../constants/theme";
 
 const GOLD = "#C9A84C";
 const BISTRO_DARK = "#080808";
+const SCROLL_ITEM_THRESHOLD = 4;
 
 export default function CartScreen() {
   const { lines, subtotal, tax, total, increment, decrement, removeItem } = useCart();
   const insets = useSafeAreaInsets();
   const isEmpty = lines.length === 0;
+  const useScrollList = lines.length > SCROLL_ITEM_THRESHOLD;
+
+  const itemList = (
+    <>
+      {lines.map((line, i) => (
+        <View key={line.item.id}>
+          {i > 0 && <View style={styles.separator} />}
+          <CartLineRow
+            line={line}
+            onDecrement={() => decrement(line.item.id)}
+            onIncrement={() => increment(line.item.id)}
+            onRemove={() => removeItem(line.item.id)}
+          />
+        </View>
+      ))}
+    </>
+  );
 
   return (
     <TabScreenWrapper>
@@ -39,25 +57,19 @@ export default function CartScreen() {
           />
         ) : (
           <View style={styles.body}>
-            <ScrollView
-              style={styles.itemsScroll}
-              contentContainerStyle={styles.itemsContent}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              bounces
-            >
-              {lines.map((line, i) => (
-                <View key={line.item.id}>
-                  {i > 0 && <View style={styles.separator} />}
-                  <CartLineRow
-                    line={line}
-                    onDecrement={() => decrement(line.item.id)}
-                    onIncrement={() => increment(line.item.id)}
-                    onRemove={() => removeItem(line.item.id)}
-                  />
-                </View>
-              ))}
-            </ScrollView>
+            {useScrollList ? (
+              <ScrollView
+                style={styles.itemsScroll}
+                contentContainerStyle={styles.itemsContent}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                bounces
+              >
+                {itemList}
+              </ScrollView>
+            ) : (
+              <View style={styles.itemsStatic}>{itemList}</View>
+            )}
 
             <View style={[styles.summary, { paddingBottom: insets.bottom + 16 }]}>
               <View style={styles.summaryDivider} />
@@ -108,24 +120,36 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
+    justifyContent: "flex-start",
   },
-  itemsScroll: {
-    flex: 1,
-  },
-  itemsContent: {
+  itemsStatic: {
+    flexGrow: 0,
+    flexShrink: 0,
     paddingHorizontal: 16,
     paddingTop: 4,
+  },
+  itemsScroll: {
     flexGrow: 0,
+    flexShrink: 1,
+    maxHeight: "65%",
+  },
+  itemsContent: {
+    flexGrow: 0,
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    paddingBottom: 8,
   },
   separator: {
     height: 1,
     backgroundColor: theme.border,
   },
   summary: {
+    flexGrow: 0,
+    flexShrink: 0,
     backgroundColor: theme.bgCard,
     paddingTop: 4,
     paddingHorizontal: 16,
-    marginTop: 0,
+    marginTop: 8,
   },
   summaryDivider: {
     height: 1,
@@ -170,8 +194,6 @@ const styles = StyleSheet.create({
   },
   checkout: {
     marginTop: 16,
-    marginHorizontal: 0,
-    marginBottom: 0,
     backgroundColor: GOLD,
     borderRadius: 10,
     paddingVertical: 16,
