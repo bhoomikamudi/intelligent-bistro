@@ -56,21 +56,30 @@ export default function CartScreen() {
                 <View key={line.item.id}>
                   {i > 0 && <View className="my-4 h-px bg-[#222222]" />}
                   <View className="py-1">
-                    <View className="flex-row items-start justify-between gap-3">
-                      <Text className="flex-1 text-[17px] font-semibold text-text-primary">{line.item.name}</Text>
-                      <Text className="text-base font-semibold text-gold">
-                        {formatPrice(line.item.price * line.quantity)}
-                      </Text>
-                    </View>
-                    <View className="mt-3 flex-row items-center justify-between">
-                      <View className="flex-row items-center gap-3.5">
-                        <GoldQtyButton label="−" onPress={() => decrement(line.item.id)} />
-                        <Text className="min-w-[28px] text-center text-base font-bold text-gold">{line.quantity}</Text>
-                        <GoldQtyButton label="+" onPress={() => increment(line.item.id)} />
+                    <View className="flex-row items-start gap-3">
+                      <View style={styles.emojiCircle}>
+                        <Text style={styles.emoji}>{line.item.emoji}</Text>
                       </View>
-                      <Pressable onPress={() => removeItem(line.item.id)}>
-                        <Text className="text-[13px] text-muted">Remove</Text>
-                      </Pressable>
+                      <View className="flex-1">
+                        <View className="flex-row items-start justify-between gap-3">
+                          <Text className="flex-1 text-[17px] font-semibold text-text-primary">{line.item.name}</Text>
+                          <Text className="text-base font-semibold text-gold">
+                            {formatPrice(line.item.price * line.quantity)}
+                          </Text>
+                        </View>
+                        <View className="mt-3 flex-row items-center justify-between">
+                          <View className="flex-row items-center gap-3.5">
+                            <GoldQtyButton label="−" onPress={() => decrement(line.item.id)} />
+                            <Text className="min-w-[28px] text-center text-base font-bold text-gold">
+                              {line.quantity}
+                            </Text>
+                            <GoldQtyButton label="+" onPress={() => increment(line.item.id)} />
+                          </View>
+                          <Pressable onPress={() => removeItem(line.item.id)}>
+                            <Text className="text-[13px] text-muted">Remove</Text>
+                          </Pressable>
+                        </View>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -106,5 +115,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 8,
     paddingBottom: 16,
+  },
+  emojiCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#1A1A1A",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emoji: {
+    fontSize: 22,
+    lineHeight: 26,
   },
 });
