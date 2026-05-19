@@ -30,8 +30,14 @@ export function MenuHero() {
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
       >
-        <View className="absolute right-0 top-0 h-32 w-32 rounded-full bg-gold/10" />
-        <View className="absolute bottom-2 left-8 h-20 w-20 rounded-full bg-gold/5" />
+        <LinearGradient
+          colors={["rgba(201, 168, 76, 0.18)", "rgba(201, 168, 76, 0)", "transparent"]}
+          locations={[0, 0.5, 1]}
+          start={{ x: 1, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.glow}
+          pointerEvents="none"
+        />
         <Animated.View style={{ opacity, transform: [{ translateY }] }}>
           <Text className="text-[11px] font-semibold uppercase tracking-[4px] text-gold">Est. 2024</Text>
           <Text className="mt-2 text-[30px] uppercase tracking-[5px] text-text-primary" style={styles.serif}>
@@ -52,6 +58,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 20,
     paddingBottom: 28,
+  },
+  glow: {
+    position: "absolute",
+    top: -48,
+    right: -48,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
   },
   serif: {
     fontFamily: "Georgia",
