@@ -130,7 +130,8 @@ const styles = StyleSheet.create({
   },
   cardInner: {
     flex: 1,
-    paddingVertical: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
     paddingHorizontal: 18,
     paddingLeft: 16,
   },
@@ -175,15 +176,16 @@ const styles = StyleSheet.create({
     color: GOLD,
   },
   description: {
-    marginTop: 10,
+    marginTop: 8,
+    marginBottom: 8,
     fontSize: 14,
     lineHeight: 21,
     color: theme.textSecondary,
   },
   addButton: {
     alignSelf: "flex-start",
-    marginTop: 14,
-    paddingVertical: 10,
+    marginTop: 0,
+    paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 10,
     backgroundColor: GOLD,
@@ -195,7 +197,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   qtyRow: {
-    marginTop: 14,
+    marginTop: 0,
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",

@@ -56,7 +56,7 @@ export default function CartScreen() {
             actionHref="/"
           />
         ) : (
-          <View style={styles.body}>
+          <View>
             {useScrollList ? (
               <ScrollView
                 style={styles.itemsScroll}
@@ -71,7 +71,7 @@ export default function CartScreen() {
               <View style={styles.itemsStatic}>{itemList}</View>
             )}
 
-            <View style={[styles.summary, { paddingBottom: insets.bottom + 16 }]}>
+            <View style={styles.summary}>
               <View style={styles.summaryDivider} />
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Subtotal</Text>
@@ -85,7 +85,7 @@ export default function CartScreen() {
                 <Text style={styles.totalLabel}>Total</Text>
                 <Text style={styles.totalValue}>{formatPrice(total)}</Text>
               </View>
-              <Pressable style={styles.checkout}>
+              <Pressable style={[styles.checkout, { marginBottom: 16 + insets.bottom }]}>
                 <Text style={styles.checkoutText}>Checkout</Text>
               </Pressable>
             </View>
@@ -118,20 +118,12 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     color: theme.textSecondary,
   },
-  body: {
-    flex: 1,
-    justifyContent: "flex-start",
-  },
   itemsStatic: {
-    flexGrow: 0,
-    flexShrink: 0,
     paddingHorizontal: 16,
     paddingTop: 4,
   },
   itemsScroll: {
-    flexGrow: 0,
-    flexShrink: 1,
-    maxHeight: "65%",
+    maxHeight: 400,
   },
   itemsContent: {
     flexGrow: 0,
@@ -144,12 +136,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.border,
   },
   summary: {
-    flexGrow: 0,
-    flexShrink: 0,
     backgroundColor: theme.bgCard,
     paddingTop: 4,
     paddingHorizontal: 16,
-    marginTop: 8,
+    marginTop: 24,
   },
   summaryDivider: {
     height: 1,
@@ -194,6 +184,7 @@ const styles = StyleSheet.create({
   },
   checkout: {
     marginTop: 16,
+    marginBottom: 16,
     backgroundColor: GOLD,
     borderRadius: 10,
     paddingVertical: 16,

@@ -315,13 +315,15 @@ const styles = StyleSheet.create({
   },
   chips: {
     marginTop: 32,
-    width: "100%",
+    alignItems: "center",
     gap: 12,
-    paddingHorizontal: 0,
   },
   chip: {
+    alignSelf: "center",
     paddingVertical: 14,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
+    minWidth: 260,
+    maxWidth: 360,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: GOLD,
